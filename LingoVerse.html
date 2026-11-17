@@ -1,0 +1,1315 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>LingoVerse</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: sticky header, sidebar nav plus one working column. The dashboard hero carries a ghosted greeting in the language being learned. */
+:root{
+  --bg:#0c0a1b; --surface:#151230; --surface-2:#1e1a42; --line:#2c2759;
+  --fg:#ece9fb; --muted:#a29cc8;
+  --accent:#7c3aed; --accent-hover:#8b5cf6; --accent-ink:#ffffff; --accent-text:#c4b5fd; --accent-soft:rgba(139,92,246,.16);
+  --good:#34d399; --good-soft:rgba(52,211,153,.14);
+  --warn:#fbbf24; --warn-soft:rgba(251,191,36,.14);
+  --bad:#f87171; --bad-soft:rgba(248,113,113,.14);
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --f-display:'Bricolage Grotesque','Hanken Grotesk',system-ui,sans-serif;
+  --f-body:'Hanken Grotesk',system-ui,-apple-system,'Segoe UI','Hiragino Sans','Yu Gothic','PingFang SC','Microsoft YaHei',sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f6f4fd; --surface:#ffffff; --surface-2:#efeafc; --line:#ddd6f3;
+    --fg:#1b1633; --muted:#5d5683;
+    --accent:#6d28d9; --accent-hover:#5b21b6; --accent-ink:#ffffff; --accent-text:#5b21b6; --accent-soft:rgba(109,40,217,.09);
+    --good:#047857; --good-soft:rgba(4,120,87,.11);
+    --warn:#b45309; --warn-soft:rgba(180,83,9,.11);
+    --bad:#b91c1c; --bad-soft:rgba(185,28,28,.09);
+    --shadow:0 1px 2px rgba(27,22,51,.06),0 10px 28px rgba(27,22,51,.07);
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f6f4fd; --surface:#ffffff; --surface-2:#efeafc; --line:#ddd6f3;
+  --fg:#1b1633; --muted:#5d5683;
+  --accent:#6d28d9; --accent-hover:#5b21b6; --accent-ink:#ffffff; --accent-text:#5b21b6; --accent-soft:rgba(109,40,217,.09);
+  --good:#047857; --good-soft:rgba(4,120,87,.11);
+  --warn:#b45309; --warn-soft:rgba(180,83,9,.11);
+  --bad:#b91c1c; --bad-soft:rgba(185,28,28,.09);
+  --shadow:0 1px 2px rgba(27,22,51,.06),0 10px 28px rgba(27,22,51,.07);
+  color-scheme:light;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button,input,textarea{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+:focus-visible{outline:2px solid var(--accent-hover);outline-offset:2px}
+.ic{width:1.1em;height:1.1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.top-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:12px}
+.brand{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;min-width:0}
+.mark{width:40px;height:40px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font:800 22px/1 var(--f-display)}
+.brand-name{display:block;font:800 19px/1.1 var(--f-display);letter-spacing:-.01em}
+.brand-sub{display:block;font-size:12px;color:var(--muted)}
+.stats{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);background:var(--surface);border-radius:999px;font-size:13px;font-variant-numeric:tabular-nums}
+.pill.warn{color:var(--warn)}
+.pill.xp{color:var(--accent-text)}
+.pill b{font-weight:700}
+button.pill{cursor:pointer}
+button.pill:hover{border-color:var(--accent)}
+
+/* shell */
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);gap:28px;padding-block:28px 72px;align-items:start}
+.side{display:flex;flex-direction:column;gap:16px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 82px)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:10px;background:none;color:var(--muted);font-weight:600;font-size:14px;text-align:left;cursor:pointer}
+.nav button:hover{background:var(--surface);color:var(--fg)}
+.nav button[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.nav .sep{height:1px;background:var(--line);margin:8px 4px}
+.langcard{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.langcard .badge{width:38px;height:38px;border-radius:10px;background:var(--accent-soft);color:var(--accent-text);display:grid;place-items:center;font-weight:800;font-size:13px}
+.langcard .meta{flex:1;min-width:0}
+.langcard .meta b{display:block;font-size:14px}
+.langcard .meta span{font-size:12px;color:var(--muted)}
+.linkbtn{background:none;border:0;color:var(--accent-text);font-weight:600;font-size:13px;cursor:pointer;padding:4px}
+.linkbtn:hover{text-decoration:underline}
+
+/* generic */
+.view{display:flex;flex-direction:column;gap:20px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;min-width:0}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+h2{font:800 22px/1.2 var(--f-display);letter-spacing:-.01em;text-wrap:balance}
+h3{font:700 17px/1.3 var(--f-display)}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-text)}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border:1px solid transparent;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:14px;cursor:pointer}
+.btn:hover{background:var(--accent-hover)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-sm{padding:8px 14px;font-size:13px}
+.btn-ghost{background:transparent;color:var(--fg);border-color:var(--line)}
+.btn-ghost:hover{background:var(--surface-2);border-color:var(--accent)}
+.tag{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent-text);font-size:12px;font-weight:700;text-transform:capitalize}
+
+/* dashboard */
+.callout{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 18px;border:1px solid var(--accent);border-radius:14px;background:var(--accent-soft)}
+.callout b{display:block}
+.callout span{color:var(--muted);font-size:13.5px}
+.hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:20px;background:var(--surface);padding:clamp(22px,4vw,38px);display:flex;flex-direction:column;gap:14px}
+.hero>*{position:relative}
+.ghost{position:absolute!important;right:-.04em;top:-.12em;font:800 clamp(5rem,17vw,10.5rem)/1 var(--f-display);color:var(--accent-soft);letter-spacing:-.04em;pointer-events:none;user-select:none;white-space:nowrap}
+.hero h1{font:800 clamp(1.9rem,4.6vw,2.9rem)/1.05 var(--f-display);letter-spacing:-.02em;max-width:15ch;text-wrap:balance}
+.lede{max-width:52ch;color:var(--muted);font-size:16px}
+.ranks{list-style:none;margin:10px 0 0;padding:0;display:flex;gap:8px;flex-wrap:wrap}
+.ranks li{display:flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:600;color:var(--muted);background:var(--bg)}
+.ranks li .dot{width:8px;height:8px;border-radius:50%;border:2px solid var(--muted)}
+.ranks li.done{color:var(--fg)}
+.ranks li.done .dot{background:var(--good);border-color:var(--good)}
+.ranks li.now{border-color:var(--accent);color:var(--accent-text);background:var(--accent-soft)}
+.ranks li.now .dot{background:var(--accent-hover);border-color:var(--accent-hover)}
+.cols{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:20px}
+.glyphs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.glyph{border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:16px 12px;text-align:center;display:flex;flex-direction:column;gap:4px}
+.glyph .g{font:800 34px/1.1 var(--f-display);color:var(--accent-text)}
+.glyph .s{font-weight:700;font-size:13.5px}
+.glyph .n{font-size:12px;color:var(--muted)}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.week div{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.week i{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;color:var(--accent-ink)}
+.week i.on{background:var(--accent);border-color:var(--accent)}
+.week .today span{color:var(--fg);font-weight:700}
+
+/* flashcards */
+.flash{min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:28px;border:1px solid var(--line);border-radius:20px;background:var(--bg);cursor:pointer;max-width:520px;width:100%;margin-inline:auto}
+.flash:hover{border-color:var(--accent)}
+.flash .big{font:800 clamp(1.9rem,6.5vw,3rem)/1.1 var(--f-display);overflow-wrap:anywhere;letter-spacing:-.01em}
+.flash .big.back{color:var(--good)}
+.flash .ex{font-style:italic;color:var(--muted);max-width:34ch}
+.deckbar{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px}
+.count{font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;min-width:64px;text-align:center}
+
+/* writing + speaking */
+.prompt{border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.target{font:700 20px/1.35 var(--f-display);color:var(--accent-text);overflow-wrap:anywhere}
+.hints{display:flex;gap:6px;flex-wrap:wrap}
+.hint{font-size:12px;padding:3px 10px;border-radius:8px;border:1px solid var(--line);color:var(--muted)}
+textarea{width:100%;min-height:110px;resize:vertical;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);line-height:1.5}
+textarea:focus{border-color:var(--accent);outline:none}
+.field{display:flex;flex-direction:column;gap:8px}
+label.lab{font-size:13px;font-weight:600}
+.check{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer}
+.check input{accent-color:var(--accent);width:16px;height:16px}
+.fb{border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;background:var(--bg)}
+.fb.good{border-color:var(--good);background:var(--good-soft)}
+.fb.bad{border-color:var(--bad);background:var(--bad-soft)}
+.fb .score{font:800 20px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.fb.good .score{color:var(--good)}
+.fb.bad .score{color:var(--bad)}
+.cmp{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:14px}
+.cmp dt{color:var(--muted)}
+.cmp dd{margin:0;overflow-wrap:anywhere}
+.say{font:800 clamp(1.5rem,4.4vw,2.2rem)/1.25 var(--f-display);overflow-wrap:anywhere}
+.steps{display:flex;gap:8px;flex-wrap:wrap;list-style:none;margin:0;padding:0;font-size:13px;color:var(--muted)}
+.steps li{padding:5px 12px;border:1px solid var(--line);border-radius:999px}
+
+/* quizzes */
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px}
+.opt{padding:13px 14px;text-align:left;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-weight:600;font-size:14px;cursor:pointer;overflow-wrap:anywhere}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.opt.right{background:var(--good-soft);border-color:var(--good);color:var(--fg)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--fg)}
+.opt:disabled{cursor:default}
+.qbox{border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.qtext{font-weight:700;font-size:16px}
+.tq{color:var(--accent-text)}
+.streakpill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:var(--good-soft);color:var(--good);font-size:13px;font-weight:700}
+.result{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px}
+.result .big{font:800 clamp(2.4rem,8vw,3.6rem)/1 var(--f-display);font-variant-numeric:tabular-nums}
+.review{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;text-align:left;width:100%}
+.review li{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--bg);font-size:14px}
+
+/* toast + modal */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:60;max-width:min(92vw,440px);padding:11px 18px;border-radius:12px;background:var(--fg);color:var(--bg);font-weight:600;font-size:14px;box-shadow:var(--shadow);text-align:center}
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(8,6,20,.72);display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+.modal{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow);max-height:100%;overflow-y:auto}
+.modal h2{font-size:24px}
+.langgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.lang-opt{display:flex;flex-direction:column;gap:2px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);text-align:left;cursor:pointer;font-weight:700}
+.lang-opt span{font-weight:500;font-size:13px;color:var(--muted)}
+.lang-opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.levels{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.level{padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-weight:700;text-transform:capitalize;cursor:pointer}
+.level[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+input[type=text]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+input[type=text]:focus{border-color:var(--accent);outline:none}
+
+@media (max-width:860px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:18px;padding-block:18px 64px}
+  .side{position:static}
+  .nav{flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px}
+  .nav button{width:auto;white-space:nowrap;border:1px solid var(--line);flex:none}
+  .nav .sep{display:none}
+  .cols{grid-template-columns:minmax(0,1fr)}
+  .brand-sub{display:none}
+}
+@media (max-width:420px){
+  .card{padding:16px}
+  .btn{padding:10px 14px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M8 7h7"/></symbol>
+  <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z"/><path d="M14 7l3 3"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+  <symbol id="i-infinity" viewBox="0 0 24 24"><path d="M12 12c-2-3-4-4-6-4a4 4 0 0 0 0 8c2 0 4-1 6-4s4-4 6-4a4 4 0 0 1 0 8c-2 0-4-1-6-4z"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v6a4 4 0 0 1-8 0V4z"/><path d="M8 6H4v1a4 4 0 0 0 4 4M16 6h4v1a4 4 0 0 1-4 4M12 14v4M8 21h8M10 18h4"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+</svg>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<header class="top"><div class="wrap top-inner" id="top-inner"></div></header>
+<div class="wrap shell">
+  <aside class="side" id="side"></aside>
+  <main class="view" id="view"></main>
+</div>
+<div id="modal-root"></div>
+
+<script>
+var DATA=(function(){
+  var RANKS=['beginner','intermediate','advanced','master'];
+  var LANGS={
+    Spanish:{voice:'es-ES',tag:'es',greet:'Hola',short:'ES'},
+    French:{voice:'fr-FR',tag:'fr',greet:'Bonjour',short:'FR'},
+    German:{voice:'de-DE',tag:'de',greet:'Hallo',short:'DE'},
+    Japanese:{voice:'ja-JP',tag:'ja',greet:'こんにちは',short:'JA'},
+    Mandarin:{voice:'zh-CN',tag:'zh-Hans',greet:'你好',short:'ZH'},
+    Italian:{voice:'it-IT',tag:'it',greet:'Ciao',short:'IT'}
+  };
+
+  var WRITING={
+    Spanish:{
+      beginner:[
+        {task:"Write a simple friendly greeting",targetPhrase:"Hola mi amigo",translation:"Hello my friend",hints:["Use 'Hola'"]},
+        {task:"Say thank you politely",targetPhrase:"Muchas gracias",translation:"Thank you very much",hints:["Express gratitude"]},
+        {task:"Say goodbye for tomorrow",targetPhrase:"Hasta mañana",translation:"See you tomorrow",hints:["Common departure"]},
+        {task:"Ask how someone is doing",targetPhrase:"¿Cómo estás tú?",translation:"How are you?",hints:["Use '¿Cómo'"]},
+        {task:"Introduce your name",targetPhrase:"Me llamo Juan",translation:"My name is Juan",hints:["Use 'Me llamo'"]}
+      ],
+      intermediate:[
+        {task:"Order a warm coffee at a café",targetPhrase:"Quisiera un café caliente, por favor",translation:"I would like a hot coffee, please",hints:["Polite ordering verb"]},
+        {task:"Ask for directions to the station",targetPhrase:"¿Dónde está la estación de tren?",translation:"Where is the train station?",hints:["Question word 'Dónde'"]},
+        {task:"Ask for the bill at a restaurant",targetPhrase:"La cuenta, por favor",translation:"The bill, please",hints:["Restaurant phrase"]},
+        {task:"Ask about the price of an item",targetPhrase:"¿Cuánto cuesta esta camiseta?",translation:"How much does this shirt cost?",hints:["Use '¿Cuánto'"]}
+      ],
+      advanced:[
+        {task:"Describe your favorite travel destination",targetPhrase:"Me encanta viajar a lugares históricos por su cultura",translation:"I love traveling to historical places for their culture",hints:["Use 'Me encanta'"]},
+        {task:"Express an opinion on future changes",targetPhrase:"Es fundamental que adaptemos las nuevas tecnologías",translation:"It is essential that we adapt new technologies",hints:["Use subjunctive"]},
+        {task:"Discuss environmental protection",targetPhrase:"Debemos preservar nuestros recursos naturales con urgencia",translation:"We must preserve our natural resources urgently",hints:["Use 'Debemos'"]}
+      ],
+      master:[
+        {task:"Discuss formal business partnership",targetPhrase:"Confirmamos nuestro compromiso mutuo en este acuerdo estratégico",translation:"We confirm our mutual commitment in this strategic agreement",hints:["Formal vocabulary"]},
+        {task:"Analyze complex economic trends",targetPhrase:"La fluctuación bursátil refleja incertidumbre macroeconómica",translation:"Stock market fluctuation reflects macroeconomic uncertainty",hints:["Executive phrasing"]}
+      ]
+    },
+    French:{
+      beginner:[
+        {task:"Write a simple friendly greeting",targetPhrase:"Bonjour mon ami",translation:"Hello my friend",hints:["Use 'Bonjour'"]},
+        {task:"Say thank you politely",targetPhrase:"Merci beaucoup",translation:"Thank you very much",hints:["Use 'Merci'"]},
+        {task:"Introduce your name",targetPhrase:"Je m'appelle Pierre",translation:"My name is Pierre",hints:["Use 'Je m'appelle'"]}
+      ],
+      intermediate:[
+        {task:"Order a hot coffee at a café",targetPhrase:"Je voudrais un café chaud, s'il vous plaît",translation:"I would like a hot coffee, please",hints:["Polite verb 'Je voudrais'"]},
+        {task:"Ask for directions in the city",targetPhrase:"Où se trouve la station de métro?",translation:"Where is the subway station?",hints:["Use 'Où se trouve'"]}
+      ],
+      advanced:[
+        {task:"Describe your favorite travel destination",targetPhrase:"J'aime voyager dans des endroits historiques pour leur culture",translation:"I love traveling to historical places for their culture",hints:["Descriptive sentence"]},
+        {task:"Discuss educational values",targetPhrase:"L'éducation est la clé du développement durable",translation:"Education is the key to sustainable development",hints:["Use 'L'éducation'"]}
+      ],
+      master:[
+        {task:"Discuss formal business partnership",targetPhrase:"Nous confirmons notre engagement mutuel dans cet accord",translation:"We confirm our mutual commitment in this agreement",hints:["Executive phrasing"]}
+      ]
+    },
+    German:{
+      beginner:[
+        {task:"Write a simple friendly greeting",targetPhrase:"Hallo mein Freund",translation:"Hello my friend",hints:["Use 'Hallo'"]},
+        {task:"Say thank you politely",targetPhrase:"Vielen Dank",translation:"Thank you very much",hints:["Express thanks"]},
+        {task:"State your name",targetPhrase:"Ich heiße Hans",translation:"My name is Hans",hints:["Use 'Ich heiße'"]}
+      ],
+      intermediate:[
+        {task:"Order a hot coffee at a café",targetPhrase:"Ich möchte bitte einen heißen Kaffee",translation:"I would like a hot coffee, please",hints:["Use 'Ich möchte'"]},
+        {task:"Ask for travel directions",targetPhrase:"Wo ist bitte der Hauptbahnhof?",translation:"Where is the central station please?",hints:["Use 'Wo ist'"]}
+      ],
+      advanced:[
+        {task:"Describe your favorite travel destination",targetPhrase:"Ich reise gerne an historische Orte wegen ihrer Kultur",translation:"I enjoy traveling to historical places because of their culture",hints:["Use 'Ich reise gerne'"]},
+        {task:"Discuss modern challenges",targetPhrase:"Wir müssen innovative Lösungen für die Zukunft finden",translation:"We must find innovative solutions for the future",hints:["Use 'Wir müssen'"]}
+      ],
+      master:[
+        {task:"Discuss formal business partnership",targetPhrase:"Wir bestätigen unser gegenseitiges Engagement in dieser Vereinbarung",translation:"We confirm our mutual commitment in this agreement",hints:["Formal German syntax"]}
+      ]
+    },
+    Japanese:{
+      beginner:[
+        {task:"Write a simple friendly greeting",targetPhrase:"こんにちは、私の友達",translation:"Hello my friend",hints:["Konnichiwa"]},
+        {task:"Say thank you politely",targetPhrase:"どうもありがとうございます",translation:"Thank you very much",hints:["Polite Arigatou"]},
+        {task:"State your name",targetPhrase:"私はケンです",translation:"I am Ken",hints:["Watashi wa"]}
+      ],
+      intermediate:[
+        {task:"Order a hot coffee at a café",targetPhrase:"温かいコーヒーをください",translation:"Hot coffee please",hints:["Use 'kudasai'"]},
+        {task:"Ask for station directions",targetPhrase:"駅はどこですか",translation:"Where is the station?",hints:["Doko desu ka"]}
+      ],
+      advanced:[
+        {task:"Describe your favorite travel destination",targetPhrase:"文化が好きなので歴史的な場所を旅するのが好きです",translation:"I like traveling to historical places because I like culture",hints:["Expressing cause"]},
+        {task:"Discuss daily routines",targetPhrase:"毎朝早く起きて仕事を始めます",translation:"Every morning I wake up early and start work",hints:["Maiasa hayaku"]}
+      ],
+      master:[
+        {task:"Discuss formal business partnership",targetPhrase:"本戦略協定における相互のコミットメントを確認いたします",translation:"We confirm our mutual commitment in this strategic agreement",hints:["Formal Keigo"]}
+      ]
+    },
+    Mandarin:{
+      beginner:[
+        {task:"Write a simple friendly greeting",targetPhrase:"你好，我的朋友",translation:"Hello my friend",hints:["Nǐ hǎo"]},
+        {task:"Say thank you politely",targetPhrase:"非常感谢你",translation:"Thank you very much",hints:["Xièxiè"]},
+        {task:"State your name",targetPhrase:"我叫张伟",translation:"My name is Zhang Wei",hints:["Wǒ jiào"]}
+      ],
+      intermediate:[
+        {task:"Order a hot coffee at a café",targetPhrase:"请给我一杯热咖啡",translation:"Please give me a hot coffee",hints:["Qǐng gěi wǒ"]},
+        {task:"Ask for directions",targetPhrase: "请问地铁站在哪里？",translation:"Excuse me, where is the subway station?",hints:["Qǐngwèn"]}
+      ],
+      advanced:[
+        {task:"Describe your favorite travel destination",targetPhrase:"我喜欢去历史悠久的地方旅游",translation:"I like traveling to places with long history",hints:["Use 'xǐhuān'"]},
+        {task:"Discuss learning languages",targetPhrase:"学习外语需要每天坚持练习",translation:"Learning a foreign language requires daily practice",hints:["Xuéxí wàiyǔ"]}
+      ],
+      master:[
+        {task:"Discuss formal business partnership",targetPhrase:"我们确认在这项战略协议中的共同承诺",translation:"We confirm our mutual commitment in this agreement",hints:["Formal business terms"]}
+      ]
+    },
+    Italian:{
+      beginner:[
+        {task:"Write a simple friendly greeting",targetPhrase:"Ciao mio amico",translation:"Hello my friend",hints:["Use 'Ciao'"]},
+        {task:"Say thank you politely",targetPhrase:"Molte grazie",translation:"Thank you very much",hints:["Polite thanks"]},
+        {task:"State your name",targetPhrase:"Mi chiamo Marco",translation:"My name is Marco",hints:["Mi chiamo"]}
+      ],
+      intermediate:[
+        {task:"Order a hot coffee at a café",targetPhrase:"Vorrei un caffè caldo, per favore",translation:"I would like a hot coffee please",hints:["Use 'Vorrei'"]},
+        {task:"Ask for directions",targetPhrase:"Dov'è la stazione ferroviaria?",translation:"Where is the railway station?",hints:["Dov'è"]}
+      ],
+      advanced:[
+        {task:"Describe your favorite travel destination",targetPhrase:"Amo viaggiare in luoghi storici per la loro cultura",translation:"I love traveling to historical places for their culture",hints:["Use 'Amo viaggiare'"]},
+        {task:"Discuss cultural appreciation",targetPhrase:"L'arte italiana rappresenta un patrimonio mondiale inestimabile",translation:"Italian art represents an invaluable world heritage",hints:["Patrimonio mondiale"]}
+      ],
+      master:[
+        {task:"Discuss formal business partnership",targetPhrase:"Confermiamo il nostro impegno reciproco in questo accordo",translation:"We confirm our mutual commitment in this agreement",hints:["Formal Italian syntax"]}
+      ]
+    }
+  };
+
+  /* [term, meaning, phonetic, example] */
+  var VOCAB={
+    Spanish:{
+      beginner:[
+        ["Hola","Hello","Oh-lah","Hola, ¿cómo estás?"],
+        ["Gracias","Thank you","Grah-see-as","Muchas gracias por todo."],
+        ["Amigo","Friend","Ah-mee-go","Mi mejor amigo."],
+        ["Por favor","Please","Por fah-vor","Un café, por favor."],
+        ["Casa","House","Kah-sah","Mi casa es su casa."],
+        ["Agua","Water","Ah-gwah","Bebo mucha agua fría."],
+        ["Libro","Book","Lee-broh","Leo un libro interesante."],
+        ["Comida","Food","Koh-mee-dah","La comida está deliciosa."],
+        ["Gato","Cat","Gah-toh","El gato duerme en el sofá."],
+        ["Perro","Dog","Peh-rroh","El perro corre en el parque."],
+        ["Sol","Sun","Sohl","El sol brilla hoy."],
+        ["Luna","Moon","Loo-nah","La luna ilumina la noche."]
+      ],
+      intermediate:[
+        ["Desarrollo","Development","Deh-sah-rroh-yoh","El desarrollo del proyecto es rápido."],
+        ["Oportunidad","Opportunity","Oh-por-too-nee-dad","Una excelente oportunidad de trabajo."],
+        ["Recomendar","To recommend","Reh-koh-men-dar","Te recomiendo visitar este sitio."],
+        ["Conocimiento","Knowledge","Koh-noh-see-mee-en-toh","El conocimiento es poder."],
+        ["Biblioteca","Library","Bee-blio-teh-kah","Estudio en la biblioteca central."],
+        ["Aeropuerto","Airport","Ah-eh-roh-pwer-toh","Llegamos al aeropuerto a tiempo."],
+        ["Entrevista","Interview","En-treh-vees-tah","Mañana tengo una entrevista."],
+        ["Experiencia","Experience","Eks-peh-ryen-see-ah","Tengo mucha experiencia en esto."],
+        ["Habitación","Room","Ah-bee-tah-syohn","Reservé una habitación doble."],
+        ["Presupuesto","Budget","Preh-soo-pwes-toh","El presupuesto es limitado."],
+        ["Tecnología","Technology","Tek-noh-loh-hee-ah","La tecnología avanza rápidamente."],
+        ["Comunicación","Communication","Koh-moo-nee-kah-syohn","La comunicación es clave."]
+      ],
+      advanced:[
+        ["Imprescindible","Essential / Indispensable","Eem-preh-seen-dee-bleh","Es imprescindible mantener la calma."],
+        ["Acontecimiento","Event / Occurrence","Ah-kohn-teh-see-mee-en-toh","Un acontecimiento histórico inolvidable."],
+        ["Paradigma","Paradigm","Pah-rah-deeg-mah","Un cambio de paradigma tecnológico."],
+        ["Perspicaz","Insightful / Perceptive","Pairs-pee-kas","Un análisis muy perspicaz."],
+        ["Incertidumbre","Uncertainty","In-ser-tee-doom-breh","Navegamos en tiempos de incertidumbre."],
+        ["Infructuoso","Fruitless / Unsuccessful","In-frook-two-oh-soh","Sus esfuerzos resultaron infructuosos."],
+        ["Vanguardia","Vanguard / Forefront","Bahn-gwar-dee-ah","A la vanguardia de la ciencia."],
+        ["Sustancial","Substantial","Soos-tahn-syal","Hubo una mejora sustancial."],
+        ["Ineludible","Unavoidable","Ee-neh-loo-dee-bleh","Un compromiso ineludible."],
+        ["Coherencia","Coherence","Koh-eh-ren-see-ah","Falta coherencia en su discurso."],
+        ["Providencial","Providential","Proh-bee-den-syal","Su ayuda fue providencial."],
+        ["Verosimilitude","Verisimilitude","Beh-roh-see-me-lee-too-d","Falta verosimilitud en la trama."]
+      ],
+      master:[
+        ["Jurisprudencia","Jurisprudence","Hoo-rees-proo-den-see-ah","Sentar un procedente en la jurisprudencia."],
+        ["Insuperable","Insurmountable / Unsurpassed","Een-soo-peh-rah-bleh","Una demostración insuperable de destreza."],
+        ["Pormenorizar","To detail / Itemize","Por-meh-noh-ree-sar","Debemos pormenorizar cada cláusula del contrato."],
+        ["Idiosincrasia","Idiosyncrasy","Ee-dee-oh-seen-krah-see-ah","Refleja la idiosincrasia cultural de la región."],
+        ["Inconmensurable","Incommensurable","In-kohn-men-soo-rah-bleh","Un valor inconmensurable."],
+        ["Dictamen","Ruling / Expert opinion","Deek-tah-men","El dictamen pericial fue concluyente."],
+        ["Consuetudinario","Customary","Kohn-sweh-too-dee-nah-ryoh","Derecho consuetudinario internacional."],
+        ["Recalcitrante","Recalcitrant","Reh-kal-see-tran-teh","Una actitud recalcitrante ante el cambio."],
+        ["Paliativo","Palliative","Pah-lyah-tee-voh","Medidas de carácter paliativo."],
+        ["Quintacolumnista","Fifth columnist","Keen-tah-koh-loo-nees-tah","Acusado de actuar como quintacolumnista."],
+        ["Esperpéntico","Grotesque / Absurd","Es-per-pen-tee-koh","Una situación esperpéntica."],
+        ["Equidistancia","Equidistance","Eh-kee-dis-tan-syah","Mantener una prudente equidistancia."]
+      ]
+    },
+    French:{
+      beginner:[
+        ["Bonjour","Hello","Bon-zhoor","Bonjour, comment allez-vous?"],
+        ["Merci","Thank you","Mair-see","Merci beaucoup!"],
+        ["Ami","Friend","Ah-mee","Mon cher ami."],
+        ["S'il vous plaît","Please","Seel voo play","Un café, s'il vous plaît."],
+        ["Maison","House","May-zohn","Notre maison est grande."],
+        ["Eau","Water","Oh","Je bois de l'eau fraîche."],
+        ["Livre","Book","Leevr","Ce livre est passionnant."],
+        ["Chat","Cat","Shah","Le chat dort paisiblement."],
+        ["Chien","Dog","Shyenn","Le chien aboie dehors."],
+        ["Soleil","Sun","Soh-lay","Le soleil brille."],
+        ["Pain","Bread","Pahn","Du pain frais tous les jours."],
+        ["Fleur","Fleur","Flur","Une belle fleur rouge."]
+      ],
+      intermediate:[
+        ["Développement","Development","Day-vlop-mahn","Le développement économique du pays."],
+        ["Amélioration","Improvement","Ah-may-lee-oh-rah-syohn","Une nette amélioration des résultats."],
+        ["Environnement","Environment","Ahn-vee-rohn-mahn","Protéger notre environnement."],
+        ["Connaissance","Knowledge","Koh-neh-sahns","La connaissance est un pouvoir."],
+        ["Bibliothèque","Library","Bee-blyo-tek","Je travaille à la bibliothèque."],
+        ["Aéroport","Airport","Ay-oh-por","Le vol part de l'aéroport."],
+        ["Voyage","Travel","Vwah-zh","Bon voyage à vous."],
+        ["Entreprise","Company","Ahn-tre-preez","Une entreprise innovante."],
+        ["Réunion","Meeting","Ray-oo-nyohn","La réunion commence à dix heures."],
+        ["Expérience","Experience","Eks-pay-ryahns","Une expérience inoubliable."],
+        ["Logiciel","Software","Loh-zhee-syel","Installer un nouveau logiciel."],
+        ["Paysage","Landscape","Pay-zazh","Le paysage est magnifique."]
+      ],
+      advanced:[
+        ["Incontournable","Unavoidable / Essential","Ahn-kohn-toor-nah-bl","Un rendez-vous incontournable."],
+        ["Épanouissement","Fulfillment / Flourishing","Ay-pah-nwee-smahn","L'épanouissement personnel est capital."],
+        ["Indispensable","Indispensable","Ahn-dees-pahn-sabl","Cette étape est indispensable."],
+        ["Perspicace","Insightful / Perceptive","Pair-spee-kass","Une analyse très perspicace."],
+        ["Incertitude","Uncertainty","Ahn-seir-tee-tud","Faire face à l'incertitude."],
+        ["Profondeur","Depth","Pro-fohn-dur","La profondeur de sa pensée."],
+        ["Envergure","Scope / Scale","Ahn-vair-gur","Un projet d'envergure internationale."],
+        ["Revirement","U-turn / Sudden change","Re-veer-mahn","Un revirement spectaculaire."],
+        ["Susciter","To arouse / prompt","Su-see-tay","Susciter l'intérêt du public."],
+        ["Perpétuer","To perpetuate","Pair-pay-tu-ay","Perpétuer la tradition."],
+        ["Inéluctable","Inescapable","Ee-nay-luk-tabl","Un destin inéluctable."],
+        ["Concordance","Concordance","Kohn-kor-dahns","Concordance des temps."]
+      ],
+      master:[
+        ["Vraisemblance","Verisimilitude / Likelihood","Vray-sahn-blahns","Examiner la vraisemblance de l'hypothèse."],
+        ["Circonspection","Circumspection / Caution","Seer-kohn-spehk-syohn","Agir avec la plus grande circonspection."],
+        ["Jurisprudence","Case law","Zhoo-ree-sproo-dahns","La jurisprudence constante du tribunal."],
+        ["Insurmontable","Insurmountable","Ahn-sur-mohn-tabl","Un obstacle insurmontable."],
+        ["Incommensurable","Incommensurable","Ahn-koh-mahn-su-rah-bl","Une joie incommensurable."],
+        ["Pusillanime","Fainthearted","Pu-zee-la-neen","Une politique pusillanime."],
+        ["Incursion","Incursion","Ahn-kur-syohn","Une incursion dans le passé."],
+        ["Séditieux","Seditious","Say-dee-syuh","Des propos séditieux."],
+        ["Rétrograde","Retrograde","Ray-troh-grad","Des idées rétrogrades."],
+        ["Iconoclaste","Iconoclastic","Ee-koh-noh-klast","Un artiste iconoclaste."],
+        ["Altruisme","Altruism","Al-tru-eezm","Agir par pur altruisme."],
+        ["Paradigme","Paradigm","Pa-ra-deegm","Un nouveau paradigme scientifique."]
+      ]
+    },
+    German:{
+      beginner:[
+        ["Hallo","Hello","HAH-loh","Hallo, wie geht's?"],
+        ["Danke","Thank you","DAHN-kuh","Danke schön."],
+        ["Freund","Friend","Froynt","Mein Freund heißt Max."],
+        ["Bitte","Please / You're welcome","BIT-tuh","Einen Kaffee, bitte."],
+        ["Haus","House","Hows","Unser Haus ist klein."],
+        ["Wasser","Water","VAHS-ser","Ich trinke kaltes Wasser."],
+        ["Buch","Book","Bookh","Das Buch liegt auf dem Tisch."],
+        ["Katze","Cat","KAT-tsuh","Die Katze schnurrt."],
+        ["Hund","Dog","Hoont","Der Hund bellt laut."],
+        ["Sonne","Sun","ZON-nuh","Die Sonne scheint hell."],
+        ["Apfel","Apple","AP-fel","Der Apfel ist süß."],
+        ["Tisch","Table","Tish","Der Tisch ist aus Holz."]
+      ],
+      intermediate:[
+        ["Entwicklung","Development","ent-VIK-lung","Die Entwicklung des Projekts ist schnell."],
+        ["Gelegenheit","Opportunity","guh-LAY-gen-hite","Das ist eine gute Gelegenheit."],
+        ["Empfehlen","To recommend","emp-FAY-len","Ich empfehle dieses Restaurant."],
+        ["Erfahrung","Experience","er-FAH-rung","Sie hat viel Erfahrung."],
+        ["Bibliothek","Library","bib-lee-oh-TAIK","Ich lerne in der Bibliothek."],
+        ["Flughafen","Airport","FLOOG-hah-fen","Wir fahren zum Flughafen."],
+        ["Gespräch","Conversation","guh-SPRAKH","Ein interessantes Gespräch."],
+        ["Unternehmen","Company / Undertaking","UN-ter-nay-men","Ein erfolgreiches Unternehmen."],
+        ["Zimmer","Room","TSIM-mer","Mein Zimmer ist im ersten Stock."],
+        ["Programm","Program","pro-GRAM","Das neue Programm läuft stabil."],
+        ["Verbindung","Connection","fer-BIN-dung","Die Internetverbindung ist gut."],
+        ["Landschaft","Landscape","LAND-shaft","Die alpine Landschaft ist schön."]
+      ],
+      advanced:[
+        ["Unerlässlich","Essential / Indispensable","UN-er-less-lish","Geduld ist unerlässlich."],
+        ["Ereignis","Event","er-EYE-gnis","Ein historisches Ereignis."],
+        ["Zusammenhang","Context / Connection","tsu-ZAM-en-hang","Der Zusammenhang ist klar."],
+        ["Verantwortung","Responsibility","fer-ANT-vor-tung","Er übernimmt die Verantwortung."],
+        ["Unwissenheit","Ignorance","UN-vis-sen-hite","Unwissenheit schützt vor Strafe nicht."],
+        ["Herausforderung","Challenge","heh-ROWS-for-de-rung","Eine große Herausforderung."],
+        ["Voraussetzung","Prerequisite","foh-ROWS-set-tsung","Das ist eine wichtige Voraussetzung."],
+        ["Überzeugung","Conviction","ue-ber-TSOY-gung","Aus tiefster Überzeugung handeln."],
+        ["Glaubwürdigkeit","Credibility","GLOWP-vuer-dig-kite","Seine Glaubwürdigkeit steht fest."],
+        ["Auswirkung","Impact / Effect","OWS-virk-ung","Die wirtschaftliche Auswirkung."],
+        ["Zuverlässigkeit","Reliability","TSU-ver-less-ig-kite","Ich schätze deine Zuverlässigkeit."],
+        ["Wohlstand","Prosperity","VOHL-shtand","Wohlstand für alle."]
+      ],
+      master:[
+        ["Gewährleisten","To guarantee","guh-VAIR-lye-sten","Wir müssen die Qualität gewährleisten."],
+        ["Auseinandersetzung","Debate / Confrontation","OWS-eye-nan-der-zet-tsung","Eine kritische Auseinandersetzung mit dem Thema."],
+        ["Selbstverständlichkeit","Matter of course","ZELPST-fer-SHTENT-lish-kite","Das ist keine Selbstverständlichkeit."],
+        ["Rechtsprechung","Case law / Jurisdiction","REKHTS-shprekh-ung","Die ständige Rechtsprechung des Gerichts."],
+        ["Unverzichtbar","Indispensable","UN-fer-tsik-tbar","Ein unverzichtbarer Bestandteil."],
+        ["Gleichgültigkeit","Indifference","GLYK-guel-tig-kite","Gegenüber Ungerechtigkeit herrscht keine Gleichgültigkeit."],
+        ["Zugehörigkeit","Affiliation / Belonging","TSU-guh-hoer-ig-kite","Das Gefühl der Zugehörigkeit."],
+        ["Widersprüchlichkeit","Contradictoriness","VEE-der-spruech-lich-kite","Die Widersprüchlichkeit seiner Argumente."],
+        ["Erforderlichkeit","Necessity","er-for-der-lich-kite","Die rechtliche Erforderlichkeit prüfen."],
+        ["Einfühlsamkeit","Empathy","EYEN-feel-sam-kite","Sie zeigt große Einfühlsamkeit."],
+        ["Unternehmungslust","Enterprise / Adventurousness","UN-ter-nay-mun-lust","Voller Unternehmungslust."],
+        ["Weltanschauung","Worldview","VELT-an-show-ung","Eine philosophische Weltanschauung."]
+      ]
+    },
+    Japanese:{
+      beginner:[
+        ["こんにちは","Hello","kon-nee-chee-wah","こんにちは、お元気ですか。"],
+        ["ありがとう","Thank you","ah-ree-gah-toh","ありがとうございます。"],
+        ["友達","Friend","toh-mo-dah-chee","友達と会います。"],
+        ["お願いします","Please","oh-neh-gah-ee shee-mahs","コーヒーをお願いします。"],
+        ["家","House","ie","私の家は大きいです。"],
+        ["水","Water","mizoo","冷たい水を飲みます。"],
+        ["本","Book","hon","面白い本を読んでいます。"],
+        ["猫","Cat","neh-koh","猫が窓の外を見ています。"],
+        ["犬","Dog","inoo","犬が元気に走っています。"],
+        ["太陽","Sun","tah-yoh","太陽が昇ります。"],
+        ["りんご","Apple","ringo","赤いりんごを食べます。"],
+        ["机","Desk","tsukue","机の上にノートがあります。"]
+      ],
+      intermediate:[
+        ["発展","Development","hah-ten","経済が発展しています。"],
+        ["機会","Opportunity","kee-kai","いい機会です。"],
+        ["おすすめ","Recommendation","oh-soo-soo-meh","おすすめの店はどこですか。"],
+        ["知識","Knowledge","chee-shee-kee","知識は力です。"],
+        ["図書館","Library","toshokan","図書館で勉強します。"],
+        ["空港","Airport","kuukou","空港へ向かいます。"],
+        ["面接","Interview","mensetsu","明日は面接があります。"],
+        ["経験","Experience","keiken","海外旅行の経験があります。"],
+        ["部屋","Room","heya","きれいな部屋ですね。"],
+        ["予算","Budget","yosan","予算内で収まる。"],
+        ["テクノロジー","Technology","tekunorojii","最新のテクノロジー。"],
+        ["コミュニケーション","Communication","komyunikeeshon","コミュニケーションが大切です。"]
+      ],
+      advanced:[
+        ["不可欠","Indispensable","foo-kah-keh-tsoo","睡眠は健康に不可欠です。"],
+        ["出来事","Event / Occurrence","deh-kee-goh-toh","大きな出来事がありました。"],
+        ["観点","Viewpoint","kahn-ten","別の観点から考えましょう。"],
+        ["洞察","Insight","doh-sah-tsoo","鋭い洞察力を持っています。"],
+        ["不確実性","Uncertainty","fukakujitsusei","不確実性に備える。"],
+        ["効率的","Efficient","kouritsuteki","効率的な作業方法。"],
+        ["優先順位","Priority","yuusenjun'i","優先順位をつける。"],
+        ["達成感","Sense of achievement","tasseikan","大きな達成感を得る。"],
+        ["客観的","Objective","kyakkanteki","客観的な意見を聞かせてください。"],
+        ["多面的","Multifaceted","tamenteki","問題を多面的に捉える。"],
+        ["影響力","Influence","eikyouryoku","強い影響力を持つ。"],
+        ["信頼性","Reliability","shinraisei","データの信頼性を確認する。"]
+      ],
+      master:[
+        ["遂行","Execution / Carrying out","soo-ee-koh","任務を遂行する。"],
+        ["締結","Conclusion (of a contract)","tei-keh-tsoo","契約を締結する。"],
+        ["見解","Opinion / Stance","ken-kai","双方の見解が異なる。"],
+        ["趣旨","Purport / Intent","shoo-shee","法律の趣旨を理解する。"],
+        ["不可侵","Inviolability","fukashin","領土の不可侵を守る。"],
+        ["妥当性","Validity / Appropriateness","datousei","主張の妥当性を検証する。"],
+        ["整合性","Consistency","seigousei","文書の整合性を保つ。"],
+        ["諸刃の剣","Double-edged sword","moroha no tsurugi","それは諸刃の剣だ。"],
+        ["一石二鳥","Killing two birds with one stone","issekichichou","まさに一石二鳥の効果だ。"],
+        ["試行錯誤","Trial and error","shikousakugo","試行錯誤の末に成功した。"],
+        ["前途多難","Troubled future / Difficult path ahead","zentotanan","前途多難なプロジェクト。"],
+        ["温故知新","Learning from the past","onkochishin","温故知新の精神で取り組む。"]
+      ]
+    },
+    Mandarin:{
+      beginner:[
+        ["你好","Hello","nǐ hǎo","你好，你叫什么名字？"],
+        ["谢谢","Thank you","xiè xie","谢谢你的帮助。"],
+        ["朋友","Friend","péng you","他是我的好朋友。"],
+        ["请","Please","qǐng","请坐。"],
+        ["家","House / Home","jiā","我的家很大。"],
+        ["水","Water","shuǐ","我喜欢喝温水。"],
+        ["书","Book","shū","这本书非常好看。"],
+        ["猫","Cat","māo","小猫在睡觉。"],
+        ["狗","Dog","gǒu","小狗很听话。"],
+        ["太阳","Sun","tài yáng","太阳出来了。"],
+        ["苹果","Apple","píng guǒ","我想吃一个苹果。"],
+        ["桌子","Desk / Table","zhuō zi","电脑在桌子上。"]
+      ],
+      intermediate:[
+        ["发展","Development","fā zhǎn","经济发展得很快。"],
+        ["机会","Opportunity","jī huì","这是一个好机会。"],
+        ["推荐","To recommend","tuī jiàn","我推荐这家餐厅。"],
+        ["知识","Knowledge","zhī shi","知识就是力量。"],
+        ["图书馆","Library","tú shū guǎn","我在图书馆看书。"],
+        ["机场","Airport","jī chǎng","我们要去机场接人。"],
+        ["面试","Interview","miàn shì","明天有一个重要面试。"],
+        ["经验","Experience","jīng yàn","他有丰富的工作经验。"],
+        ["房间","Room","fáng jiān","这个房间采光很好。"],
+        ["预算","Budget","yù suàn","我们需要重新做预算。"],
+        ["科技","Technology","kē jì","科技改变了生活。"],
+        ["交流","Communication / Exchange","jiāo liú","文化交流增进了友谊。"]
+      ],
+      advanced:[
+        ["不可或缺","Indispensable","bù kě huò quē","耐心是不可或缺的。"],
+        ["事件","Event / Incident","shì jiàn","这是一个历史事件。"],
+        ["观点","Viewpoint","guān diǎn","我不同意你的观点。"],
+        ["洞察","Insight","dòng chá","她很有洞察力。"],
+        ["不确定性","Uncertainty","bù què dìng xìng","应对市场的各种不确定性。"],
+        ["高效","Efficient","gāo xiào","我们追求高效的工作方式。"],
+        ["优先权","Priority","yōu xiān quán","把这件事放在最高优先权。"],
+        ["成就感","Sense of achievement","chéng jiù gǎn","项目完成时很有成就感。"],
+        ["客观","Objective","kè guān","我们要客观地评价问题。"],
+        ["全方位","Comprehensive / All-round","quán fāng wèi","全方位推进改革。"],
+        ["影响力","Influence","yǐng xiǎng lì","扩大品牌的全球影响力。"],
+        ["可靠性","Reliability","kě kào xìng","测试系统的可靠性。"]
+      ],
+      master:[
+        ["履行","To fulfill (an obligation)","lǚ xíng","双方必须履行合同。"],
+        ["协议","Agreement","xié yì","两家公司签署了协议。"],
+        ["权衡","To weigh up","quán héng","我们需要权衡利弊。"],
+        ["惯例","Convention / Precedent","guàn lì","按照国际惯例处理。"],
+        ["不可侵犯","Inviolable","bù kě qīn fàn","国家主权不可侵犯。"],
+        ["妥当","Appropriate","tuǒ dàng","这样处理非常妥当。"],
+        ["合规性","Compliance","hé guī xìng","确保各项业务的合规性。"],
+        ["双赢","Win-win","shuāng yíng","实现互利双赢的局面。"],
+        ["潜移默化","Subtle influence","qián yí mò huà","文化对人有潜移默化的作用。"],
+        ["循序渐进","Step by step","xún xù jiàn jìn","学习语言需要循序渐进。"],
+        ["举足轻重","Pivotal / Decisive","jǔ zú qīng zhòng","他在团队中起着举足轻重的作用。"],
+        ["博大精深","Profound and extensive","bó dà jīng shēn","中华文化博大精深。"]
+      ]
+    },
+    Italian:{
+      beginner:[
+        ["Ciao","Hello / Bye","CHAH-oh","Ciao, come stai?"],
+        ["Grazie","Thank you","GRAHT-tsyeh","Grazie mille!"],
+        ["Amico","Friend","ah-MEE-koh","Il mio migliore amico."],
+        ["Per favore","Please","pehr fah-VOH-reh","Un caffè, per favore."],
+        ["Casa","House","KAH-sah","La nostra casa è accogliente."],
+        ["Acqua","Water","AH-kwah","Bevo acqua fresca."],
+        ["Libro","Book","LEE-broh","Sto leggendo un libro."],
+        ["Gatto","Cat","GAT-toh","Il gatto dorme vicino al fuoco."],
+        ["Cane","Dog","KAH-neh","Il cane corre felice."],
+        ["Sole","Sun","SOH-leh","Il sole splende alto."],
+        ["Mela","Apple","MEH-lah","Mangio una mela rossa."],
+        ["Tavolo","Table","TAH-voh-loh","Il tavolo è apparecchiato."]
+      ],
+      intermediate:[
+        ["Sviluppo","Development","ZVEE-loop-poh","Lo sviluppo del progetto è rapido."],
+        ["Opportunità","Opportunity","op-por-too-nee-TAH","Una grande opportunità di lavoro."],
+        ["Consigliare","To recommend","kon-see-LYAH-reh","Ti consiglio questo ristorante."],
+        ["Conoscenza","Knowledge","koh-noh-SHEN-tsah","La conoscenza è potere."],
+        ["Biblioteca","Library","bee-blio-TEH-kah","Studio spesso in biblioteca."],
+        ["Aeroporto","Airport","ah-eh-ro-POR-toh","Siamo arrivati in aeroporto."],
+        ["Colloquio","Interview","kol-LOH-kwoh","Ho un colloquio di lavoro."],
+        ["Esperienza","Experience","es-peh-RYEN-tsah","Un'esperienza meravigliosa."],
+        ["Camera","Room","KAH-meh-rah","Ho prenotato una camera singola."],
+        ["Budget","Budget","BUD-jet","Il budget è stato approvato."],
+        ["Tecnologia","Technology","tek-noh-loh-JEE-ah","La tecnologia moderna."],
+        ["Comunicazione","Communication","koh-moo-nee-kah-TSYOH-neh","La comunicazione è fondamentale."]
+      ],
+      advanced:[
+        ["Indispensabile","Indispensable","een-dee-spen-SAH-bee-leh","La pazienza è indispensabile."],
+        ["Avvenimento","Event","ahv-veh-nee-MEN-toh","Un avvenimento storico."],
+        ["Prospettiva","Perspective","pro-spet-TEE-vah","Una nuova prospettiva sul problema."],
+        ["Perspicace","Insightful","per-spee-KAH-cheh","Un'analisi molto perspicace."],
+        ["Incertezza","Uncertainty","in-cher-TET-tsah","Navigare in un mare d'incertezza."],
+        ["Efficienza","Efficiency","ef-fee-CHEN-tsah","Migliorare l'efficienza aziendale."],
+        ["Priorità","Priority","pree-oh-ree-TAH","Questa è la nostra priorità."],
+        ["Consapevolezza","Awareness","kon-sah-poh-veh-LET-tsah","Acquisire maggiore consapevolezza."],
+        ["Oggettivo","Objective","od-jet-TEE-voh","Un dato oggettivo e verificabile."],
+        ["Rilevante","Relevant","ree-leh-VAHN-tech","Un fattore economicamente rilevante."],
+        ["Influenza","Influence","een-floo-EN-tsah","Esercitare una forte influenza."],
+        ["Attendibilità","Reliability","at-ten-dee-bee-lee-TAH","Verificare l'attendibilità della fonte."]
+      ],
+      master:[
+        ["Giurisprudenza","Case law / Law studies","joo-ree-proo-DEN-tsah","La giurisprudenza costante della Corte."],
+        ["Insormontabile","Insurmountable","een-sor-mon-TAH-bee-leh","Un ostacolo insormontabile."],
+        ["Adempiere","To fulfill (an obligation)","ah-DEM-pyeh-reh","Le parti devono adempiere agli obblighi."],
+        ["Consuetudine","Custom / Established practice","kon-sweh-TOO-dee-neh","Secondo la consuetudine commerciale."],
+        ["Inviolabile","Inviolable","een-vyoh-LAH-bee-leh","I diritti umani sono inviolabili."],
+        ["Congruenza","Congruence","kon-GROO-en-tsah","La congruenza dei dati fiscali."],
+        ["Puntualizzazione","Clarification","poon-twa-lwee-zah-tsyoh-NEH","Una doverosa puntualizzazione."],
+        ["Reciprocità","Reciprocity","reh-chee-proh-chee-TAH","Basato su principi di reciprocità."],
+        ["Lungimiranza","Foresight","loon-jee-mi-RAN-tsah","Una decisione di grande lungimiranza."],
+        ["Imprescrittibile","Imprescriptible / Inalienable","im-preh-skreet-TEE-bee-leh","Un diritto imprescrittibile."],
+        ["Inesauribile","Exhaustive / Inexhaustible","ee-neh-zow-REE-bee-leh","Una fonte inesauribile di idee."],
+        ["Magna Charta","Magna Carta / Fundamental document","MAH-nya KAR-tah","La magna charta dei diritti civili."]
+      ]
+    }
+  };
+
+  /* [glyph, sound, note] */
+  var SCRIPT={
+    Spanish:[["ñ","ny","As in “canyon”: año, mañana"],["ll","y","Like “y” in “yes” in most regions: llamar"],["rr","rolled r","A trilled r: perro, carro"]],
+    French:[["é","ay","As in “café”: été, école"],["ç","s","A soft s before a, o, u: français"],["ou","oo","As in “food”: bonjour, vous"]],
+    German:[["ü","ee, lips rounded","Say “ee” with rounded lips: müde"],["ö","eh, lips rounded","Say “eh” with rounded lips: schön"],["ß","ss","A sharp s: Straße"]],
+    Japanese:[["あ","a","As in “father”"],["い","i","As in “machine”"],["う","u","As in “moon”, lips relaxed"],["え","e","As in “bed”"],["お","o","As in “more”, short"]],
+    Mandarin:[["妈 mā","tone 1","High and flat (mother)"],["麻 má","tone 2","Rising (hemp)"],["马 mǎ","tone 3","Dips, then rises (horse)"],["骂 mà","tone 4","Sharp fall (to scold)"]],
+    Italian:[["gli","ly","As in “million”: figlio"],["gn","ny","As in “canyon”: gnocchi"],["ce / ci","che / chee","A soft “ch”: ciao, cena"]]
+  };
+
+  var SPEAK={
+    beginner:{title:"First introductions",tip:"Focus on clear vowel pronunciation."},
+    intermediate:{title:"Ordering and public enquiries",tip:"Pay attention to word connections and speed."},
+    advanced:{title:"Complex opinion and narrative",tip:"Keep a smooth rhythm and place stress precisely."},
+    master:{title:"Executive discourse and debate",tip:"Deliver with confident articulation and a formal tone."}
+  };
+
+  /* [question, correct, wrong, wrong, wrong] */
+  var SPANISH_EXAM={
+    beginner:[
+      ['Which phrase means "Hello my friend" in Spanish?','Hola mi amigo','Hasta luego','Por favor','De nada'],
+      ['Translate: "Muchas gracias" into English.','Thank you very much','Good morning','Where is the station','See you soon'],
+      ['What is the Spanish word for "Friend"?','Amigo','Casa','Libro','Agua'],
+      ['Which phrase is used to say "See you tomorrow"?','Hasta mañana','Buenos días','Con permiso','Por favor'],
+      ['Choose the correct response to "Gracias":','De nada','Hasta mañana','Buenas noches','Hola'],
+      ['Select the Spanish word for "Please":','Por favor','Gracias','Hola','Amigo']
+    ],
+    intermediate:[
+      ['Select the sentence that orders coffee politely in Spanish:','Quisiera un café caliente, por favor','Me llamo Juan','Hasta mañana','Buenas noches'],
+      ['Which question asks for directions to the train station?','¿Dónde está la estación de tren?','¿Cómo estás tú?','¿Qué hora es?','¿Cuánto cuesta?'],
+      ['What does the term "Desarrollo" mean?','Development','Opportunity','Knowledge','Environment'],
+      ['Choose the verb that means "To recommend" in Spanish:','Recomendar','Viajar','Preguntar','Comprar'],
+      ['Translate: "¿Cuánto cuesta esta camiseta?"','How much does this shirt cost?','Where is the museum?','What time is it?','Can I help you?'],
+      ['Identify the past tense form of "Hacer" (I did/made):','Hice','Hago','Haré','Haciendo'],
+      ['What does "Conocimiento" translate to?','Knowledge','Acknowledge','Community','Conversation'],
+      ['Select the phrase that means "I would like to make a reservation":','Me gustaría hacer una reserva','Quiero pagar la cuenta','Dónde está el baño','Tengo hambre']
+    ],
+    advanced:[
+      ['Identify the advanced term for "Essential / Indispensable":','Imprescindible','Acontecimiento','Paradigma','Perspicaz'],
+      ['Translate: "Me encanta viajar a lugares históricos por su cultura."','I love traveling to historical places for their culture','I hate history','I want to build a house','Culture is boring'],
+      ['What does the Spanish word "Acontecimiento" mean?','Event / Occurrence','Disaster','Beginning','Conclusion'],
+      ['Which subjunctive form completes: "Es importante que tú ___ (estudiar)"?','estudies','estudias','estudiaste','estudiarás'],
+      ['Select the word that means "Insightful / Perceptive":','Perspicaz','Inútil','Repentino','Común'],
+      ['What does "Cambio de paradigma" translate to?','Paradigm shift','Exchange of currency','Parallel road','Parameter change'],
+      ['Choose the correct relative pronoun: "El edificio ___ se construyó en 1920."','que','quien','cuyo','dondequiera'],
+      ['What is the meaning of "No obstante"?','Nevertheless / However','Never','Obviously','In addition'],
+      ['Translate: "A no ser que tengamos más tiempo..."','Unless we have more time...','Because we have more time...','Although we are late...','If we had money...'],
+      ['Identify the correct usage of the conditional perfect:','Habría viajado si hubiera tenido dinero','Viajo mañana si puedo','Viajaba cuando era joven','Viajé ayer por la tarde']
+    ],
+    master:[
+      ['Identify the formal commitment phrase in Spanish business:','Confirmamos nuestro compromiso mutuo en este acuerdo','Hola amigo','Dame un café','No sé nada'],
+      ['What does the legal term "Jurisprudencia" mean?','Jurisprudence','Prudence','Judgement','Jurisdiction'],
+      ['Translate: "Debemos pormenorizar cada cláusula del contrato."','We must itemize every clause of the contract','We should cancel the contract','The contract is signed','We agree without reading'],
+      ['Which term means "Insurmountable / Unsurpassed"?','Insuperable','Insustituible','Incierto','Inofensivo'],
+      ['What does "Idiosincrasia" signify in academic discourse?','Idiosyncrasy / Cultural trait','Idiomatic expression','Ideological conflict','Symptom'],
+      ['Select the sophisticated verb for "To itemize / detail":','Pormenorizar','Hablar','Contar','Explicar'],
+      ['Translate: "Sentar un precedente histórico"','Set a historical precedent','Sit down in history','Send a historic letter','Recall the past'],
+      ['Identify the term for "Understatement / Litotes" in Spanish:','Atenuación / Lítote','Hipérbole','Metáfora','Anáfora'],
+      ['Which clause structure represents high-level formal diplomatic protocol?','A tenor de lo dispuesto en el artículo pertinente...','Si tú quieres vamos...','Yo creo que sí...','Mañana te aviso...'],
+      ['Translate: "A la luz de los acontecimientos acaecidos recientemente..."','In light of recent occurrences...','At night during recent events...','Lighting up the recent room...','Looking at bright developments...'],
+      ['What does "Sine qua non" mean in contract law?','Requisito indispensable (Indispensable condition)','Sin importancia','De poca calidad','Con fecha posterior'],
+      ['Select the sentence with a flawless executive tone:','Agradecemos de antemano su estimable colaboración en este proyecto estratégico.','Gracias por ayudar con el proyecto.','Ojalá ayudes pronto.','Danos ayuda mañana.']
+    ]
+  };
+
+  return {RANKS:RANKS,LANGS:LANGS,WRITING:WRITING,VOCAB:VOCAB,SCRIPT:SCRIPT,SPEAK:SPEAK,SPANISH_EXAM:SPANISH_EXAM};
+})();
+</script>
+
+<script>
+(function(){
+'use strict';
+var D=DATA,RANKS=D.RANKS,LANGS=D.LANGS;
+var EXAM_COUNT={beginner:6,intermediate:8,advanced:10,master:12};
+/* How strictly the writing studio grades at each rank */
+var RULES={
+  beginner:{strip:true,mult:1,pass:60,note:'Beginner: accents are optional and a partial match can pass.'},
+  intermediate:{strip:true,mult:0.95,pass:75,note:'Intermediate: accents are optional, but most words must match.'},
+  advanced:{strip:false,mult:0.9,pass:85,note:'Advanced: accents and spelling count.'},
+  master:{strip:false,mult:0.85,pass:100,note:'Master: only a flawless match passes.'}
+};
+var TABS=[
+  {id:'dashboard',label:'Curriculum Dashboard',icon:'grid'},
+  {id:'vocab',label:'Reading & Vocab Deck',icon:'book'},
+  {id:'writing',label:'Writing Studio',icon:'pencil'},
+  {id:'speaking',label:'Speaking Studio',icon:'mic'},
+  {id:'practice',label:'Infinite Practice Quiz',icon:'infinity'},
+  {id:'exam',label:'Rank-Up Final Exam',icon:'trophy'}
+];
+
+/* ---------- helpers ---------- */
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function z(n){return (n<10?'0':'')+n}
+function ymd(d){return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate())}
+function today(){return ymd(new Date())}
+function daysAgo(n){var d=new Date();d.setDate(d.getDate()-n);return d}
+function I(n){return '<svg class="ic" aria-hidden="true"><use href="#i-'+n+'"/></svg>'}
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+
+/* ---------- state ---------- */
+var S={
+  user:null,lang:'Spanish',ranks:{},xp:120,streak:1,last:today(),history:[today()],onboarded:false,
+  tab:'dashboard',card:0,flipped:false,
+  write:{idx:0,input:'',hide:false,fb:null},
+  speak:{idx:0,done:false},
+  exam:{qs:[],ans:{},submitted:false,score:0,rankedTo:null,review:[]},
+  quiz:{q:null,picked:null,streak:0,lastKey:null}
+};
+function rank(){return S.ranks[S.lang]||'beginner'}
+function save(){
+  store('lingoverse_state',JSON.stringify({user:S.user,lang:S.lang,ranks:S.ranks,xp:S.xp,streak:S.streak,last:S.last,history:S.history,onboarded:S.onboarded}));
+}
+function load(){
+  var raw=store('lingoverse_state');if(!raw)return;
+  try{
+    var d=JSON.parse(raw);
+    if(d.user&&d.user.name)S.user={name:String(d.user.name)};
+    if(LANGS[d.lang])S.lang=d.lang;
+    if(d.ranks&&typeof d.ranks==='object'){RANKS.forEach(function(){});Object.keys(LANGS).forEach(function(l){if(RANKS.indexOf(d.ranks[l])>-1)S.ranks[l]=d.ranks[l]})}
+    if(typeof d.xp==='number')S.xp=d.xp;
+    if(typeof d.streak==='number')S.streak=d.streak;
+    if(typeof d.last==='string')S.last=d.last;
+    if(Array.isArray(d.history))S.history=d.history.filter(function(x){return typeof x==='string'});
+    S.onboarded=!!d.onboarded;
+  }catch(e){}
+  if(S.last!==today()&&S.last!==ymd(daysAgo(1)))S.streak=0;
+}
+
+/* ---------- content access ---------- */
+function vocab(lang,r){return (D.VOCAB[lang][r]||[]).map(function(v){return {term:v[0],meaning:v[1],say:v[2],ex:v[3]}})}
+function prompts(lang,r){return D.WRITING[lang][r]||D.WRITING[lang].beginner}
+function items(lang,upto){
+  var out=[];
+  RANKS.slice(0,RANKS.indexOf(upto)+1).forEach(function(r){
+    vocab(lang,r).forEach(function(v){out.push({t:v.term,m:v.meaning,r:r,kind:'word'})});
+    (D.WRITING[lang][r]||[]).forEach(function(w){out.push({t:w.targetPhrase,m:w.translation,r:r,kind:'phrase'})});
+  });
+  return out;
+}
+function makeQ(it,pool,dir,lang){
+  var key=dir?'t':'m';
+  var same=pool.filter(function(p){return p!==it&&p.kind===it.kind&&p[key]!==it[key]});
+  var rest=pool.filter(function(p){return p!==it&&p.kind!==it.kind&&p[key]!==it[key]});
+  var opts=[it[key]];
+  shuffle(same).concat(shuffle(rest)).forEach(function(p){if(opts.length<4&&opts.indexOf(p[key])===-1)opts.push(p[key])});
+  opts=shuffle(opts);
+  var html=dir
+    ?'How do you say <span class="tq">“'+esc(it.m)+'”</span> in '+lang+'?'
+    :'What does <span class="tq" lang="'+LANGS[lang].tag+'">“'+esc(it.t)+'”</span> mean?';
+  return {html:html,options:opts,correct:opts.indexOf(it[key]),tl:!!dir};
+}
+function fromBank(b){var opts=shuffle(b.slice(1));return {html:esc(b[0]),options:opts,correct:opts.indexOf(b[1]),tl:false}}
+
+/* ---------- toast, streak, xp ---------- */
+var toastTimer=null;
+function toast(msg){
+  var t=$('#toast');t.textContent=msg;t.hidden=false;
+  clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.hidden=true},3800);
+}
+function recordActivity(){
+  var t=today();if(S.last===t)return null;
+  S.streak=(S.last===ymd(daysAgo(1)))?S.streak+1:1;
+  S.last=t;if(S.history.indexOf(t)<0)S.history.push(t);
+  S.history=S.history.slice(-60);
+  return S.streak;
+}
+function award(n){
+  var st=recordActivity();S.xp+=n;save();renderHeader();
+  toast('+'+n+' XP'+(st?' · '+st+'-day streak':''));
+}
+
+/* ---------- audio ---------- */
+function speak(text,rate){
+  try{
+    var ss=window.speechSynthesis;
+    if(!ss||typeof SpeechSynthesisUtterance==='undefined'){toast('Audio is not available in this browser.');return}
+    ss.cancel();
+    var u=new SpeechSynthesisUtterance(text);u.lang=LANGS[S.lang].voice;u.rate=rate||0.9;ss.speak(u);
+  }catch(e){toast('Audio is not available here.')}
+}
+
+/* ---------- learning state resets ---------- */
+function resetLearning(keepExam){
+  S.card=0;S.flipped=false;
+  S.write={idx:0,input:'',hide:S.write.hide,fb:null};
+  S.speak={idx:0,done:false};
+  S.quiz={q:null,picked:null,streak:0,lastKey:null};
+  if(!keepExam)S.exam={qs:[],ans:{},submitted:false,score:0,rankedTo:null,review:[]};
+}
+
+/* ---------- writing scoring ---------- */
+function norm(s,strip){
+  var x=String(s).normalize('NFC').toLowerCase().replace(/[.,\/#!$%^&*;:{}=\-_`~()?¿¡"“”'’‘、。，！？・…]/g,' ').replace(/\s+/g,' ').trim();
+  if(strip)x=x.normalize('NFD').replace(/[̀-ͯ]/g,'').normalize('NFC');
+  return x;
+}
+function scoreWriting(input,target,rule){
+  var tn=norm(target,rule.strip),inn=norm(input,rule.strip);
+  var charMode=tn.indexOf(' ')===-1;
+  var tt=charMode?Array.from(tn):tn.split(' ');
+  var it=charMode?Array.from(inn.replace(/ /g, '')):(inn?inn.split(' '):[]);
+  var left=it.slice(),m=0;
+  tt.forEach(function(t){var i=left.indexOf(t);if(i>-1){left.splice(i,1);m++}});
+  var acc=tt.length?m/tt.length*100:0;
+  var exact=tn===inn;
+  return {exact:exact,score:exact?100:Math.min(99,Math.round(acc*rule.mult))};
+}
+
+/* ---------- views ---------- */
+function renderHeader(){
+  $('#top-inner').innerHTML=
+    '<a class="brand" href="#dashboard"><span class="mark" aria-hidden="true">L</span><span><span class="brand-name">LingoVerse</span><span class="brand-sub">Universal language academy</span></span></a>'+
+    '<div class="stats">'+
+      '<span class="pill warn" title="Daily streak">'+I('flame')+'<b>'+S.streak+'</b> '+(S.streak===1?'day':'days')+'</span>'+
+      '<span class="pill xp" title="Experience points">'+I('star')+'<b>'+S.xp+'</b> XP</span>'+
+      (S.user
+        ?'<button class="pill" data-act="open-auth">'+I('user')+esc(S.user.name)+'</button>'
+        :'<button class="btn btn-sm" data-act="open-auth">Create profile</button>')+
+    '</div>';
+}
+function renderSide(){
+  var nav=TABS.map(function(t,i){
+    return (i===4?'<div class="sep"></div>':'')+'<button data-act="nav" data-tab="'+t.id+'"'+(S.tab===t.id?' aria-current="page"':'')+'>'+I(t.icon)+t.label+'</button>';
+  }).join('');
+  $('#side').innerHTML=
+    '<nav class="nav" aria-label="Sections">'+nav+'</nav>'+
+    '<div class="langcard"><div class="badge">'+LANGS[S.lang].short+'</div><div class="meta"><b>'+S.lang+'</b><span>'+cap(rank())+' tier</span></div>'+
+    '<button class="linkbtn" data-act="open-onboard">Change</button></div>';
+}
+
+function vDashboard(){
+  var lang=S.lang,r=rank(),ri=RANKS.indexOf(r),cfg=LANGS[lang];
+  var banner=S.onboarded?'':
+    '<div class="callout"><div><b>Choose your language and level</b><span>You are set to '+lang+' at Beginner. Change it any time.</span></div>'+
+    '<button class="btn btn-sm" data-act="open-onboard">Choose</button></div>';
+  var track=RANKS.map(function(x,i){
+    return '<li class="'+(i<ri?'done':i===ri?'now':'')+'"><span class="dot"></span>'+cap(x)+'</li>';
+  }).join('');
+  var glyphs=D.SCRIPT[lang].map(function(g){
+    return '<div class="glyph"><span class="g" lang="'+cfg.tag+'">'+esc(g[0])+'</span><span class="s">'+esc(g[1])+'</span><span class="n">'+esc(g[2])+'</span></div>';
+  }).join('');
+  var week='';
+  for(var i=6;i>=0;i--){
+    var d=daysAgo(i),on=S.history.indexOf(ymd(d))>-1;
+    week+='<div class="'+(i===0?'today':'')+'"><i class="'+(on?'on':'')+'">'+(on?I('check'):'')+'</i><span>'+d.toLocaleDateString(undefined,{weekday:'short'})+'</span></div>';
+  }
+  return banner+
+  '<section class="hero">'+
+    '<div class="ghost" aria-hidden="true" lang="'+cfg.tag+'">'+esc(cfg.greet)+'</div>'+
+    '<p class="eyebrow">Current rank · '+cap(r)+'</p>'+
+    '<h1>Master '+lang+' step by step</h1>'+
+    '<p class="lede">Work through vocabulary, writing and speaking, then pass the rank-up exam with a perfect score to move up.</p>'+
+    '<div class="row"><button class="btn" data-act="nav" data-tab="vocab">Start next lesson '+I('arrow')+'</button>'+
+    '<button class="btn btn-ghost" data-act="nav" data-tab="exam">Rank-up exam</button></div>'+
+    '<ol class="ranks" aria-label="Rank progress">'+track+'</ol>'+
+  '</section>'+
+  '<div class="cols">'+
+    '<section class="card"><div class="card-head"><div><p class="eyebrow">Sounds and script</p><h2>'+lang+' essentials</h2></div></div>'+
+      '<p class="muted small" style="margin-bottom:14px">Sounds that are easy to miss when you are starting out.</p>'+
+      '<div class="glyphs">'+glyphs+'</div></section>'+
+    '<section class="card"><div class="card-head"><div><p class="eyebrow">Daily streak</p><h2>Last 7 days</h2></div></div>'+
+      '<div class="week">'+week+'</div>'+
+      '<p class="muted small" style="margin-top:14px">Finish any lesson or quiz to keep your streak going.</p></section>'+
+  '</div>';
+}
+
+function vVocab(){
+  var deck=vocab(S.lang,rank()),tag=LANGS[S.lang].tag;
+  if(S.card>=deck.length)S.card=0;
+  var c=deck[S.card];
+  var face=S.flipped
+    ?'<span class="eyebrow">Translation and usage</span><p class="big back">'+esc(c.meaning)+'</p><p class="ex" lang="'+tag+'">“'+esc(c.ex)+'”</p>'
+    :'<span class="eyebrow">Target term</span><p class="big" lang="'+tag+'">'+esc(c.term)+'</p><p class="muted small">Sounds like: '+esc(c.say)+'</p>';
+  return '<section class="card">'+
+    '<div class="card-head"><div><p class="eyebrow">Flashcards</p><h2>Vocabulary in '+S.lang+'</h2></div><span class="tag">'+rank()+' deck</span></div>'+
+    '<div class="flash" data-act="flip" data-key="flip-card">'+face+'</div>'+
+    '<div class="deckbar">'+
+      '<button class="btn btn-ghost btn-sm" data-act="prev" data-key="prev">Previous</button>'+
+      '<span class="count">'+(S.card+1)+' of '+deck.length+'</span>'+
+      '<button class="btn btn-sm" data-act="next" data-key="next">Next card</button>'+
+    '</div>'+
+    '<div class="deckbar" style="margin-top:10px">'+
+      '<button class="btn btn-ghost btn-sm" data-act="flip" data-key="flip">'+I('refresh')+'Flip card</button>'+
+      '<button class="btn btn-ghost btn-sm" data-act="say-card" data-key="say">'+I('volume')+'Listen</button>'+
+    '</div></section>';
+}
+
+function curPrompt(){var p=prompts(S.lang,rank());return p[S.write.idx%p.length]}
+function vWriting(){
+  var p=curPrompt(),r=rank(),tag=LANGS[S.lang].tag,W=S.write,fb=W.fb;
+  var target=W.hide?'<p class="muted small">Phrase hidden. Write it from the translation.</p>'
+    :'<p class="small muted">Target phrase</p><p class="target" lang="'+tag+'">'+esc(p.targetPhrase)+'</p>';
+  var hints=(p.hints||[]).map(function(h){return '<span class="hint">Hint: '+esc(h)+'</span>'}).join('');
+  var fbHtml='';
+  if(fb){
+    fbHtml='<div class="fb '+(fb.passed?'good':'bad')+'" role="status">'+
+      '<p class="score">'+fb.score+'/100</p>'+
+      '<p>'+(fb.passed?(fb.exact?'Exact match. Nicely done.':'Passed for the '+cap(r)+' tier. Check the target below for anything you missed.'):'Not quite. Compare your answer with the target and try again.')+'</p>'+
+      '<dl class="cmp"><dt>You wrote</dt><dd lang="'+tag+'">'+esc(fb.raw)+'</dd><dt>Target</dt><dd lang="'+tag+'">'+esc(fb.target)+'</dd></dl>'+
+    '</div>';
+  }
+  return '<section class="card">'+
+    '<div class="card-head"><div><p class="eyebrow">Writing studio</p><h2>'+esc(p.task)+'</h2></div><span class="tag">'+r+' tier</span></div>'+
+    '<div class="prompt">'+target+'<p class="muted">Meaning: '+esc(p.translation)+'</p>'+(hints?'<div class="hints">'+hints+'</div>':'')+'</div>'+
+    '<div class="field" style="margin-top:16px">'+
+      '<label class="lab" for="write-input">Type your answer in '+S.lang+'</label>'+
+      '<textarea id="write-input" lang="'+tag+'" placeholder="Type here in '+S.lang+'..."'+(fb&&fb.passed?' readonly':'')+'>'+esc(W.input)+'</textarea>'+
+      '<div class="row">'+
+        (fb&&fb.passed
+          ?'<button class="btn" data-act="write-next" data-key="wnext">Next prompt '+I('arrow')+'</button>'
+          :'<button class="btn" data-act="write-check" data-key="wcheck">Check writing</button>'+
+           '<button class="btn btn-ghost" data-act="write-next" data-key="wskip">Skip prompt</button>')+
+        '<label class="check"><input type="checkbox" id="write-hide"'+(W.hide?' checked':'')+'> Hide the phrase</label>'+
+      '</div>'+
+      '<p class="muted small">'+RULES[r].note+'</p>'+
+    '</div>'+
+    (fbHtml?'<div style="margin-top:16px">'+fbHtml+'</div>':'')+
+  '</section>';
+}
+
+function vSpeaking(){
+  var r=rank(),pool=prompts(S.lang,r),p=pool[S.speak.idx%pool.length],tag=LANGS[S.lang].tag,sc=D.SPEAK[r];
+  return '<section class="card">'+
+    '<div class="card-head"><div><p class="eyebrow">Scenario · '+esc(sc.title)+'</p><h2>Speaking studio</h2></div><span class="tag">'+r+' tier</span></div>'+
+    '<div class="prompt">'+
+      '<p class="say" lang="'+tag+'">'+esc(p.targetPhrase)+'</p>'+
+      '<p class="muted">Meaning: '+esc(p.translation)+'</p>'+
+      '<p class="muted small">Guide: '+esc((p.hints&&p.hints[0])||'Speak the phrase clearly')+'. '+esc(sc.tip)+'</p>'+
+    '</div>'+
+    '<ol class="steps" style="margin-top:16px"><li>1. Listen</li><li>2. Say it aloud</li><li>3. Mark it practiced</li></ol>'+
+    '<div class="row" style="margin-top:14px">'+
+      '<button class="btn btn-ghost" data-act="speak-play" data-key="sp1">'+I('volume')+'Listen</button>'+
+      '<button class="btn btn-ghost" data-act="speak-slow" data-key="sp2">'+I('volume')+'Listen slowly</button>'+
+      (S.speak.done
+        ?'<button class="btn" data-act="speak-next" data-key="sp4">Next phrase '+I('arrow')+'</button>'
+        :'<button class="btn" data-act="speak-done" data-key="sp3">'+I('mic')+'I said it aloud (+30 XP)</button>')+
+    '</div>'+
+    (S.speak.done?'<div class="fb good" style="margin-top:16px" role="status"><p class="score">Practice logged</p><p>Try it once more from memory, without the audio.</p></div>':'')+
+    '<p class="muted small" style="margin-top:14px">This studio plays native-style audio and tracks practice. It does not record or score your voice.</p>'+
+  '</section>';
+}
+
+function qBlock(q,picked,locked,attr){
+  return '<div class="opts">'+q.options.map(function(o,i){
+    var cls='opt';
+    if(locked){if(i===q.correct)cls+=' right';else if(i===picked)cls+=' wrong'}
+    else if(picked===i)cls+=' on';
+    return '<button class="'+cls+'" '+attr(i)+(locked?' disabled':'')+(q.tl?' lang="'+LANGS[S.lang].tag+'"':'')+'>'+esc(o)+'</button>';
+  }).join('')+'</div>';
+}
+function newQuiz(){
+  var r=rank(),pool=items(S.lang,r),it,tries=0;
+  do{it=pick(pool);tries++}while(it.t===S.quiz.lastKey&&tries<10&&pool.length>1);
+  S.quiz.lastKey=it.t;S.quiz.picked=null;
+  S.quiz.q=makeQ(it,items(S.lang,'master'),Math.random()<0.5?0:1,S.lang);
+}
+function vPractice(){
+  var Q=S.quiz;if(!Q.q)newQuiz();
+  var q=Q.q,locked=Q.picked!==null,ok=locked&&Q.picked===q.correct;
+  var fb='';
+  if(locked){
+    fb='<div class="fb '+(ok?'good':'bad')+'" role="status"><p><b>'+(ok?'Correct. +15 XP':'Not quite.')+'</b>'+(ok?'':' The answer is “'+esc(q.options[q.correct])+'”.')+'</p>'+
+      '<div><button class="btn btn-sm" data-act="quiz-next" data-key="qnext">Next question '+I('arrow')+'</button></div></div>';
+  }
+  return '<section class="card">'+
+    '<div class="card-head"><div><p class="eyebrow">Practice</p><h2>Infinite quiz in '+S.lang+'</h2><p class="muted small">Endless questions at '+cap(rank())+' tier and below. Each correct answer earns 15 XP.</p></div>'+
+    '<span class="streakpill">'+I('flame')+Q.streak+' in a row</span></div>'+
+    '<div class="qbox"><p class="qtext">'+q.html+'</p>'+qBlock(q,Q.picked,locked,function(i){return 'data-act="quiz-pick" data-i="'+i+'"'})+'</div>'+
+    (fb?'<div style="margin-top:16px">'+fb+'</div>':'')+
+  '</section>';
+}
+
+function newExam(){
+  var lang=S.lang,r=rank(),n=EXAM_COUNT[r];
+  var all=items(lang,'master'),base=items(lang,r);
+  var cur=shuffle(base.filter(function(x){return x.r===r})),low=shuffle(base.filter(function(x){return x.r!==r}));
+  var chosen=cur.concat(low);
+  var gen=[];
+  for(var i=0;i<chosen.length&&gen.length<n;i++)gen.push(makeQ(chosen[i],all,Math.random()<0.5?0:1,lang));
+  var qs;
+  if(lang==='Spanish'){qs=shuffle(D.SPANISH_EXAM[r].map(fromBank).concat(gen)).slice(0,n)}
+  else qs=gen;
+  S.exam={qs:qs.map(function(q,i){q.id=i;return q}),ans:{},submitted:false,score:0,rankedTo:null,review:[]};
+}
+function vExam(){
+  var E=S.exam,r=rank();
+  if(!E.qs.length)newExam();E=S.exam;
+  var head='<div class="card-head"><div><p class="eyebrow">Rank-up</p><h2>Final exam</h2>'+
+    '<p class="muted small">Current rank: <b>'+cap(r)+'</b> · '+E.qs.length+' questions · a perfect score moves you up.</p></div>'+
+    '<button class="btn btn-ghost btn-sm" data-act="exam-new">'+I('refresh')+'New questions</button></div>';
+  if(!E.submitted){
+    var answered=Object.keys(E.ans).length,total=E.qs.length;
+    var list=E.qs.map(function(q,qi){
+      return '<div class="qbox"><p class="qtext">'+(qi+1)+'. '+q.html+'</p>'+
+        '<div class="opts" data-q="'+q.id+'">'+q.options.map(function(o,i){
+          var on=E.ans[q.id]===i;
+          return '<button class="opt'+(on?' on':'')+'" aria-pressed="'+on+'" data-act="exam-pick" data-q="'+q.id+'" data-i="'+i+'"'+(q.tl?' lang="'+LANGS[S.lang].tag+'"':'')+'>'+esc(o)+'</button>';
+        }).join('')+'</div></div>';
+    }).join('');
+    return '<section class="card">'+head+'<div style="display:flex;flex-direction:column;gap:14px">'+list+
+      '<button class="btn" id="exam-submit" data-act="exam-submit"'+(answered<total?' disabled':'')+'>Submit exam (<span id="exam-count">'+answered+'</span>/'+total+' answered)</button></div></section>';
+  }
+  var perfect=E.score===100;
+  var msg=perfect
+    ?(E.rankedTo?'You ranked up to <b>'+cap(E.rankedTo)+'</b>. Your lessons now use the new tier.':'You already hold the top rank. Excellent work.')
+    :'You need 100% to rank up. Review the misses below and retake with fresh questions.';
+  var review=E.review.length?'<ul class="review">'+E.review.map(function(x){
+    return '<li><div>'+x.q+'</div><div class="small muted" style="margin-top:6px">Your answer: '+esc(x.yours)+' · Correct: <b style="color:var(--good)">'+esc(x.right)+'</b></div></li>';
+  }).join('')+'</ul>':'';
+  return '<section class="card">'+head+'<div class="result"><p class="eyebrow">'+(perfect?'Perfect score':'Keep going')+'</p><p class="big" style="color:'+(perfect?'var(--good)':'var(--warn)')+'">'+E.score+'%</p><p class="muted" style="max-width:46ch">'+msg+'</p>'+
+    '<button class="btn" data-act="exam-new">Retake with fresh questions</button>'+review+'</div></section>';
+}
+
+var VIEWS={dashboard:vDashboard,vocab:vVocab,writing:vWriting,speaking:vSpeaking,practice:vPractice,exam:vExam};
+function renderView(){$('#view').innerHTML=VIEWS[S.tab]()}
+function render(){renderHeader();renderSide();renderView()}
+
+/* ---------- navigation ---------- */
+function setTab(t,fromHash){
+  if(!VIEWS[t])t='dashboard';
+  S.tab=t;
+  if(!fromHash){try{if(location.hash!=='#'+t)location.hash=t}catch(e){}}
+  render();
+  try{window.scrollTo(0,0)}catch(e){}
+}
+
+/* ---------- modals ---------- */
+var M={lang:'Spanish',level:'beginner'},lastFocus=null;
+function openModal(html){
+  lastFocus=document.activeElement;
+  $('#modal-root').innerHTML='<div class="overlay" data-act="close-modal-bg">'+html+'</div>';
+  var f=$('#modal-root button, #modal-root input');if(f)f.focus();
+}
+function closeModal(){
+  $('#modal-root').innerHTML='';
+  if(lastFocus&&lastFocus.focus){try{lastFocus.focus()}catch(e){}}
+}
+function onboardHtml(force){
+  var langs=Object.keys(LANGS).map(function(l){
+    return '<button type="button" class="lang-opt" data-act="ob-lang" data-lang="'+l+'" aria-pressed="'+(M.lang===l)+'">'+l+'<span lang="'+LANGS[l].tag+'">'+esc(LANGS[l].greet)+'</span></button>';
+  }).join('');
+  var lv=RANKS.map(function(x){
+    return '<button type="button" class="level" data-act="ob-level" data-level="'+x+'" aria-pressed="'+(M.level===x)+'">'+x+'</button>';
+  }).join('');
+  return '<div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">'+
+    '<div><h2 id="m-title">Welcome to LingoVerse</h2><p class="muted small" style="margin-top:6px">Choose your target language and current proficiency level to start.</p></div>'+
+    '<div class="field"><span class="lab" style="font-size:13px;font-weight:600">Language</span><div class="langgrid">'+langs+'</div></div>'+
+    '<div class="field"><span class="lab" style="font-size:13px;font-weight:600">Experience level</span><div class="levels">'+lv+'</div></div>'+
+    '<div class="row"><button class="btn" data-act="ob-done" style="flex:1">Start learning</button>'+
+    (!force ? '<button class="btn btn-ghost" data-act="close-modal">Cancel</button>' : '')+'</div>'+
+  '</div>';
+}
+function authHtml(){
+  return '<form class="modal" id="auth-form" role="dialog" aria-modal="true" aria-labelledby="m-title">'+
+    '<div><h2 id="m-title">'+(S.user?'Your profile':'Create a profile')+'</h2><p class="muted small" style="margin-top:6px">Your name and progress are saved in this browser only.</p></div>'+
+    '<div class="field"><label class="lab" for="auth-name">Display name</label><input type="text" id="auth-name" autocomplete="nickname" maxlength="40" value="'+esc(S.user?S.user.name:'')+'" placeholder="Your name"></div>'+
+    '<div class="row"><button class="btn" type="submit" style="flex:1">Save profile</button>'+
+    (S.user?'<button class="btn btn-ghost" type="button" data-act="signout">Remove</button>':'')+
+    '<button class="btn btn-ghost" type="button" data-act="close-modal">Cancel</button></div>'+
+  '</form>';
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',function(e){
+  var overlay=e.target.classList&&e.target.classList.contains('overlay');
+  if(overlay){
+    if (!S.onboarded) return; // Prevent closing by backdrop click on first visit
+    closeModal();
+    return;
+  }
+  var b=e.target.closest('[data-act]');if(!b)return;
+  var a=b.dataset.act,key=b.dataset.key;
+  var keepFocus=true;
+  switch(a){
+    case 'nav':setTab(b.dataset.tab);return;
+    case 'open-onboard':M={lang:S.lang,level:rank()};openModal(onboardHtml(false));return;
+    case 'open-auth':openModal(authHtml());return;
+    case 'close-modal':if(!S.onboarded)return; closeModal();return;
+    case 'ob-lang':M.lang=b.dataset.lang;M.level=S.ranks[M.lang]||'beginner';$('#modal-root .overlay').innerHTML=onboardHtml(!S.onboarded);
+      var l=$('[data-lang="'+M.lang+'"]');if(l)l.focus();return;
+    case 'ob-level':M.level=b.dataset.level;$('#modal-root .overlay').innerHTML=onboardHtml(!S.onboarded);
+      var lv=$('[data-level="'+M.level+'"]');if(lv)lv.focus();return;
+    case 'ob-done':
+      var changed=M.lang!==S.lang||M.level!==rank();
+      S.lang=M.lang;S.ranks[M.lang]=M.level;S.onboarded=true;save();resetLearning(false);
+      closeModal();render();
+      toast(changed?'Switched to '+S.lang+' at '+cap(M.level)+'.':'Course set for '+S.lang+' ('+M.level+').');return;
+    case 'signout':S.user=null;save();closeModal();renderHeader();toast('Profile removed.');return;
+    case 'flip':S.flipped=!S.flipped;break;
+    case 'prev':{var n=vocab(S.lang,rank()).length;S.card=S.card>0?S.card-1:n-1;S.flipped=false;break}
+    case 'next':{var n2=vocab(S.lang,rank()).length;S.card=S.card<n2-1?S.card+1:0;S.flipped=false;break}
+    case 'say-card':{var c=vocab(S.lang,rank())[S.card];if(c)speak(c.term);return}
+    case 'write-check':checkWriting();break;
+    case 'write-next':{
+      var pool=prompts(S.lang,rank()),ni=S.write.idx;
+      if(pool.length>1){while(ni===S.write.idx)ni=Math.floor(Math.random()*pool.length)}
+      S.write={idx:ni,input:'',hide:S.write.hide,fb:null};break}
+    case 'speak-play':{var p=prompts(S.lang,rank());speak(p[S.speak.idx%p.length].targetPhrase,0.9);return}
+    case 'speak-slow':{var p2=prompts(S.lang,rank());speak(p2[S.speak.idx%p2.length].targetPhrase,0.6);return}
+    case 'speak-done':S.speak.done=true;award(30);break;
+    case 'speak-next':{var p3=prompts(S.lang,rank());S.speak={idx:(S.speak.idx+1)%p3.length,done:false};break}
+    case 'quiz-pick':{
+      if(S.quiz.picked!==null)return;
+      S.quiz.picked=+b.dataset.i;
+      if(S.quiz.picked===S.quiz.q.correct){S.quiz.streak++;award(15)}else S.quiz.streak=0;
+      key='qnext';break}
+    case 'quiz-next':newQuiz();break;
+    case 'exam-pick':{
+      var q=+b.dataset.q,i=+b.dataset.i;S.exam.ans[q]=i;
+      $$('.opts[data-q="'+q+'"] .opt').forEach(function(o,oi){var on=oi===i;o.classList.toggle('on',on);o.setAttribute('aria-pressed',on)});
+      var cnt=Object.keys(S.exam.ans).length,sb=$('#exam-submit');
+      $('#exam-count').textContent=cnt;if(sb)sb.disabled=cnt<S.exam.qs.length;
+      return}
+    case 'exam-submit':submitExam();break;
+    case 'exam-new':newExam();break;
+    default:return;
+  }
+  renderView();
+  if(a==='speak-done'||a==='quiz-pick')renderHeader();
+  if(key&&keepFocus){var el=$('[data-key="'+key+'"]');if(el)el.focus()}
+  if(a==='exam-new'||a==='exam-submit'){try{window.scrollTo(0,0)}catch(e){}}
+});
+document.addEventListener('input',function(e){
+  if(e.target.id==='write-input')S.write.input=e.target.value;
+});
+document.addEventListener('change',function(e){
+  if(e.target.id==='write-hide'){S.write.hide=e.target.checked;renderView()}
+});
+document.addEventListener('submit',function(e){
+  if(e.target.id!=='auth-form')return;
+  e.preventDefault();
+  var name=$('#auth-name').value.trim();
+  if(!name){toast('Enter a display name.');return}
+  S.user={name:name};save();closeModal();renderHeader();toast('Welcome, '+name+'. Profile saved.');
+});
+document.addEventListener('keydown',function(e){
+  var m=$('#modal-root .modal');if(!m)return;
+  if(e.key==='Escape'){if(S.onboarded) closeModal();return}
+  if(e.key==='Tab'){
+    var f=$$('button,input',m).filter(function(x){return !x.disabled});if(!f.length)return;
+    var first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+  }
+});
+window.addEventListener('hashchange',function(){
+  var t=location.hash.slice(1);if(VIEWS[t]&&t!==S.tab)setTab(t,true);
+});
+
+/* ---------- actions ---------- */
+function checkWriting(){
+  var ta=$('#write-input'),raw=ta?ta.value:S.write.input;S.write.input=raw;
+  if(!raw.trim()){toast('Type your answer first.');return}
+  var p=curPrompt(),rule=RULES[rank()],res=scoreWriting(raw,p.targetPhrase,rule),passed=res.score>=rule.pass;
+  S.write.fb={score:res.score,passed:passed,exact:res.exact,target:p.targetPhrase,raw:raw};
+  if(passed)award(40);else toast('Below the '+cap(rank())+' pass mark. Try again.');
+}
+function submitExam(){
+  var E=S.exam,correct=0,review=[];
+  E.qs.forEach(function(q,i){
+    var a=E.ans[q.id];
+    if(a===q.correct)correct++;
+    else review.push({q:(i+1)+'. '+q.html,yours:a===undefined?'(no answer)':q.options[a],right:q.options[q.correct]});
+  });
+  E.score=Math.round(correct/E.qs.length*100);E.submitted=true;E.review=review;
+  if(E.score===100){
+    var ci=RANKS.indexOf(rank());
+    if(ci<RANKS.length-1){
+      var nx=RANKS[ci+1];E.rankedTo=nx;S.ranks[S.lang]=nx;
+      var keep=S.exam;resetLearning(true);S.exam=keep;
+    }
+    award(500);save();renderSide();
+    toast(E.rankedTo?'Perfect score. Ranked up to '+cap(E.rankedTo)+'.':'Perfect score at the top rank.');
+  }else{
+    award(50);toast('Exam complete: '+E.score+'%. You need 100% to rank up.');
+  }
+}
+
+/* ---------- boot ---------- */
+load();
+var t0=location.hash.slice(1);
+if(VIEWS[t0])S.tab=t0;
+if(S.tab==='practice')newQuiz();
+render();
+
+// Automatically prompt user to choose language on first visit if not onboarded
+if(!S.onboarded){
+  M={lang:S.lang,level:rank()};
+  openModal(onboardHtml(true));
+}
+})();
+</script>
+
+</body></html>

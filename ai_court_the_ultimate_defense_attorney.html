@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Court: The Ultimate Defense Attorney</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            300: '#fde047',
+                            400: '#facc15',
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            700: '#a16207',
+                        },
+                        mahogany: {
+                            800: '#2b1008',
+                            900: '#1a0804',
+                            950: '#0d0402',
+                        },
+                        court: {
+                            slate: '#0f172a',
+                            panel: '#1e293b',
+                            accent: '#334155',
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            background-image: radial-gradient(circle at 50% 0%, rgba(202, 138, 4, 0.15), transparent 70%);
+        }
+        .cinzel { font-family: 'Cinzel', serif; }
+        .gavel-glow { filter: drop-shadow(0 0 10px rgba(234, 179, 8, 0.4)); }
+        .wood-texture {
+            background: linear-gradient(135deg, #1c0c08 0%, #2b1008 50%, #150603 100%);
+            border: 1px solid rgba(202, 138, 4, 0.2);
+        }
+        .judge-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .judge-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(234, 179, 8, 0.6);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ca8a04; }
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 15px rgba(234, 179, 8, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(234, 179, 8, 0.5); }
+        }
+        .pulse-gold { animation: pulse-gold 3s infinite; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-gold-500 selection:text-black">
+
+    <!-- Top Navigation Header -->
+    <header class="border-b border-gold-600/30 bg-mahogany-950/90 backdrop-blur sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showScreen('crimes')">
+                <i class="fa-solid fa-gavel text-gold-500 text-2xl gavel-glow"></i>
+                <h1 class="cinzel text-xl md:text-2xl font-bold tracking-wider text-amber-100">
+                    AI COURT <span class="text-gold-500 text-sm font-sans font-normal tracking-normal hidden md:inline">| Ultimate Defense Attorney</span>
+                </h1>
+            </div>
+
+            <!-- Career Stats Badge -->
+            <div class="flex items-center space-x-4 text-xs md:text-sm">
+                <div class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 flex items-center space-x-3">
+                    <div><span class="text-slate-400">Cases:</span> <span id="stat-cases" class="font-bold text-white">0</span></div>
+                    <div class="h-4 w-[1px] bg-slate-700"></div>
+                    <div><span class="text-slate-400">Wins:</span> <span id="stat-wins" class="font-bold text-emerald-400">0</span></div>
+                    <div class="h-4 w-[1px] bg-slate-700"></div>
+                    <div><span class="text-slate-400">Rep:</span> <span id="stat-rep" class="font-bold text-gold-400">1000</span></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow">
+        
+        <!-- ================= STEP 1: CRIME & CLIENT SELECTION ================= -->
+        <section id="screen-crimes" class="space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="cinzel text-3xl md:text-4xl font-extrabold text-gold-400">Select Case & Client</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">Choose from over 100 distinct offenses across 6 legal categories. Can you secure an acquittal from our 10 AI judges?</p>
+            </div>
+
+            <!-- Category Filter Tabs -->
+            <div class="flex flex-wrap justify-center gap-2 py-2" id="category-tabs">
+                <!-- Dynamically filled by JS -->
+            </div>
+
+            <!-- Difficulty Filter Bar -->
+            <div class="flex flex-wrap justify-center items-center gap-2 pb-2 text-xs" id="difficulty-tabs">
+                <span class="text-slate-500 font-semibold uppercase tracking-wider text-[11px] mr-1">Difficulty:</span>
+                <!-- Dynamically filled by JS -->
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Crime Search & List -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-slate-500"></i>
+                        <input type="text" id="crime-search" placeholder="Search 100+ crimes (e.g. 'pigeon', 'insider', 'laser')..." 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-gold-500 text-white">
+                    </div>
+
+                    <div id="crimes-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[500px] overflow-y-auto pr-2">
+                        <!-- Crime cards injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Client Profile & Case Preview -->
+                <div class="space-y-4">
+                    <div class="wood-texture p-5 rounded-2xl shadow-xl border border-gold-600/30 sticky top-20">
+                        <div class="flex justify-between items-center border-b border-gold-600/20 pb-3 mb-4">
+                            <h3 class="cinzel text-lg font-bold text-gold-400 flex items-center gap-2">
+                                <i class="fa-solid fa-user-shield"></i> Client Profile
+                            </h3>
+                            <button id="btn-reroll-client" class="text-xs bg-slate-800 hover:bg-slate-700 text-gold-400 px-3 py-1.5 rounded-lg border border-gold-500/30 flex items-center gap-1 transition">
+                                <i class="fa-solid fa-dice"></i> Reroll Client
+                            </button>
+                        </div>
+
+                        <div id="client-card" class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <div id="client-avatar" class="w-14 h-14 rounded-full bg-slate-800 border-2 border-gold-500 flex items-center justify-center text-2xl font-bold text-gold-400">
+                                    ?
+                                </div>
+                                <div>
+                                    <h4 id="client-name" class="font-bold text-white text-base">Select a crime first</h4>
+                                    <p id="client-job" class="text-xs text-slate-400">Occupation</p>
+                                    <span id="client-trait" class="inline-block mt-1 text-[10px] bg-slate-800 border border-slate-700 text-gold-300 px-2 py-0.5 rounded-full">Trait</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-2 text-xs">
+                                <div>
+                                    <span class="text-slate-500 block font-semibold">ALLEGED CRIME:</span>
+                                    <div class="flex items-center justify-between">
+                                        <p id="client-crime-title" class="text-slate-200 font-medium">None Selected</p>
+                                        <div id="client-crime-diff" class="text-[10px] font-bold"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500 block font-semibold">ACCUSATION SUMMARY:</span>
+                                    <p id="client-crime-desc" class="text-slate-400 italic">Select a case from the list on the left.</p>
+                                </div>
+                                <div>
+                                    <span class="text-slate-500 block font-semibold">CLAIMED ALIBI / EVIDENCE:</span>
+                                    <p id="client-alibi" class="text-amber-200/90">Click a crime to generate client defense claims.</p>
+                                </div>
+                            </div>
+
+                            <button id="btn-proceed-defense" disabled 
+                                class="w-full mt-4 py-3 bg-slate-800 text-slate-500 cursor-not-allowed font-semibold rounded-xl transition flex items-center justify-center gap-2 cinzel">
+                                Build Defense Strategy <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STEP 2: DEFENSE & STRATEGY PHASE ================= -->
+        <section id="screen-defense" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-4">
+                <div>
+                    <button onclick="showScreen('crimes')" class="text-xs text-slate-400 hover:text-gold-400 mb-1 flex items-center gap-1">
+                        <i class="fa-solid fa-chevron-left"></i> Change Case
+                    </button>
+                    <h2 class="cinzel text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
+                        <span>Defense Strategy:</span> <span id="def-crime-name" class="text-gold-400">Crime Name</span>
+                    </h2>
+                </div>
+                <div class="bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-xs flex items-center gap-3">
+                    <span class="text-slate-400">Defendant: <strong id="def-client-name" class="text-white">Name</strong></span>
+                    <span class="text-slate-600">|</span>
+                    <span class="text-slate-400">Difficulty: <span id="def-crime-diff-badge"></span></span>
+                </div>
+            </div>
+
+            <!-- Client Case & Claim Brief Box -->
+            <div class="wood-texture p-4 md:p-5 rounded-2xl border border-gold-600/30 bg-slate-900/90 shadow-lg space-y-3">
+                <div class="flex justify-between items-center border-b border-gold-600/20 pb-2.5">
+                    <h3 class="cinzel text-sm md:text-base font-bold text-gold-400 flex items-center gap-2">
+                        <i class="fa-solid fa-folder-open text-gold-500"></i> Client Case & Claim Brief
+                    </h3>
+                    <span id="def-client-trait-badge" class="text-[11px] bg-slate-800 border border-slate-700 text-gold-300 px-2.5 py-0.5 rounded-full font-semibold">
+                        Trait
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 space-y-1">
+                        <span class="text-slate-500 font-bold uppercase tracking-wider text-[10px] block">Client Occupation:</span>
+                        <p id="def-client-job" class="text-slate-200 font-medium">Occupation</p>
+                    </div>
+                    <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 space-y-1">
+                        <span class="text-slate-500 font-bold uppercase tracking-wider text-[10px] block">Alleged Crime Summary:</span>
+                        <p id="def-crime-desc" class="text-slate-300 italic">Crime description...</p>
+                    </div>
+                    <div class="bg-slate-950/80 p-3 rounded-xl border border-amber-500/30 bg-amber-950/20 space-y-1">
+                        <span class="text-gold-400 font-bold uppercase tracking-wider text-[10px] block">Client's Claimed Alibi:</span>
+                        <p id="def-client-alibi" class="text-amber-200 font-serif italic">"Client alibi..."</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Interactive Controls -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Custom Defense Argument Typing Console -->
+                    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <h3 class="cinzel text-base font-bold text-gold-400 flex items-center gap-2">
+                                <i class="fa-solid fa-pen-nib text-gold-500"></i> Write Your Full Defense Argument
+                            </h3>
+                            <span id="char-count" class="text-xs text-slate-400 font-sans">0 characters</span>
+                        </div>
+                        
+                        <p class="text-xs text-slate-400">
+                            Type out your defense speech for the 10 AI judges. Address the client's alibi, question the evidence, invoke legal technicalities, or make an emotional plea!
+                        </p>
+
+                        <!-- Strategic Keyword Helper Chips -->
+                        <div class="space-y-1.5">
+                            <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">Suggested Strategy Keywords (Click to insert):</span>
+                            <div class="flex flex-wrap gap-1.5" id="keyword-chips">
+                                <button type="button" onclick="insertKeyword('reasonable doubt')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-gold-300 border border-slate-700 px-2 py-0.5 rounded-md transition">+ Reasonable Doubt</button>
+                                <button type="button" onclick="insertKeyword('alibi corroboration')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-gold-300 border border-slate-700 px-2 py-0.5 rounded-md transition">+ Alibi Corroboration</button>
+                                <button type="button" onclick="insertKeyword('procedural misconduct')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-gold-300 border border-slate-700 px-2 py-0.5 rounded-md transition">+ Procedural Error</button>
+                                <button type="button" onclick="insertKeyword('lack of physical evidence')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-gold-300 border border-slate-700 px-2 py-0.5 rounded-md transition">+ Lack of Evidence</button>
+                                <button type="button" onclick="insertKeyword('digital audit trail')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-gold-300 border border-slate-700 px-2 py-0.5 rounded-md transition">+ Digital Audit</button>
+                                <button type="button" onclick="insertKeyword('improper warrant')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-gold-300 border border-slate-700 px-2 py-0.5 rounded-md transition">+ Improper Warrant</button>
+                            </div>
+                        </div>
+
+                        <textarea id="custom-statement" rows="8" 
+                            placeholder="Your Honor and members of the jury, the prosecution has failed to establish guilt beyond a reasonable doubt. My client was miles away from the scene, as proven by..." 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm focus:outline-none focus:border-gold-500 text-slate-200 placeholder:text-slate-600 leading-relaxed font-serif"></textarea>
+                    </div>
+
+                    <!-- Launch Trial Button -->
+                    <button id="btn-start-trial" 
+                        class="w-full py-4 bg-gradient-to-r from-gold-600 to-amber-500 hover:from-gold-500 hover:to-amber-400 text-mahogany-950 font-black text-lg rounded-2xl shadow-xl transition transform active:scale-98 flex items-center justify-center gap-3 cinzel">
+                        <i class="fa-solid fa-gavel text-xl"></i> Present Written Defense to the 10 AI Judges!
+                    </button>
+                </div>
+
+                <!-- AI Jury Panel Preview Box -->
+                <div class="space-y-4">
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-4 sticky top-20">
+                        <h3 class="cinzel text-sm font-bold text-gold-400 border-b border-slate-800 pb-2 flex justify-between items-center">
+                            <span>The AI Judicial Bench</span>
+                            <span class="text-[10px] font-sans text-slate-400">10 Judges</span>
+                        </h3>
+                        <p class="text-xs text-slate-400">Your custom typed argument will be analyzed by each judge's unique personality and biases. Win at least <strong>6 out of 10 votes</strong> for acquittal.</p>
+                        
+                        <div class="space-y-2 max-h-[420px] overflow-y-auto pr-1" id="judges-preview-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STEP 3: COURTROOM TRIAL & VERDICT ================= -->
+        <section id="screen-trial" class="hidden space-y-6">
+            <div class="wood-texture rounded-3xl p-6 md:p-8 border-2 border-gold-600/40 shadow-2xl relative overflow-hidden">
+                <!-- Ambient Glow Effects -->
+                <div class="absolute -top-24 -right-24 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <!-- Trial Header Banner -->
+                <div class="text-center space-y-2 border-b border-gold-600/30 pb-6">
+                    <div id="trial-status-badge" class="inline-block px-3 py-1 bg-amber-500/20 text-gold-300 border border-gold-500/40 rounded-full text-xs font-semibold uppercase tracking-wider animate-pulse">
+                        <i class="fa-solid fa-scale-balanced mr-1"></i> Jury Deliberation in Progress
+                    </div>
+                    <h2 class="cinzel text-3xl md:text-4xl font-extrabold text-white" id="trial-title">The People v. Client</h2>
+                    <p class="text-sm text-slate-300 italic" id="trial-subtitle">Charge: Crime Name</p>
+                </div>
+
+                <!-- Live Scoreboard -->
+                <div class="my-6 max-w-xl mx-auto bg-slate-950/80 border border-slate-800 rounded-2xl p-4 flex justify-around items-center">
+                    <div class="text-center">
+                        <span class="text-xs text-slate-400 uppercase font-semibold">Not Guilty</span>
+                        <div class="text-3xl md:text-4xl font-black text-emerald-400 font-mono" id="tally-acquitted">0</div>
+                    </div>
+                    <div class="h-10 w-[1px] bg-slate-800"></div>
+                    <div class="text-center">
+                        <span class="text-xs text-slate-400 uppercase font-semibold">Target</span>
+                        <div class="text-sm font-bold text-slate-300">6 Votes Needed</div>
+                    </div>
+                    <div class="h-10 w-[1px] bg-slate-800"></div>
+                    <div class="text-center">
+                        <span class="text-xs text-slate-400 uppercase font-semibold">Guilty</span>
+                        <div class="text-3xl md:text-4xl font-black text-rose-500 font-mono" id="tally-guilty">0</div>
+                    </div>
+                </div>
+
+                <!-- 10 AI Judges Interactive Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 my-6" id="judges-voting-grid">
+                    <!-- 10 Judge cards render here -->
+                </div>
+
+                <!-- Final Verdict Modal / Banner (Hidden initially) -->
+                <div id="verdict-banner" class="hidden mt-8 bg-slate-950 border-2 rounded-2xl p-6 text-center space-y-4 animate-fade-in">
+                    <div id="verdict-icon" class="text-5xl"></div>
+                    <h3 id="verdict-main-text" class="cinzel text-3xl md:text-4xl font-black"></h3>
+                    <p id="verdict-sub-text" class="text-slate-300 max-w-2xl mx-auto text-sm"></p>
+
+                    <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-xl max-w-2xl mx-auto text-left space-y-2">
+                        <span class="text-xs text-gold-400 font-bold uppercase tracking-wider block">Lead Judge Statement:</span>
+                        <p id="lead-judge-quote" class="text-slate-200 italic font-serif text-sm md:text-base">"..."</p>
+                        <p id="lead-judge-name" class="text-xs text-slate-500 font-semibold text-right">- Presiding Judge</p>
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-4 pt-4">
+                        <button onclick="showScreen('crimes')" 
+                            class="px-6 py-3 bg-gradient-to-r from-gold-600 to-amber-500 text-slate-950 font-bold rounded-xl shadow-lg hover:from-gold-500 transition cinzel">
+                            <i class="fa-solid fa-folder-plus mr-1"></i> Accept Next Case
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-950/60 py-4 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
+            <p>AI Court: The Ultimate Defense Attorney &copy; 2026. Interactive Courtroom Simulator.</p>
+            <p class="text-slate-600">Simulating 10 unique AI Judicial Personalities with procedural legal evaluation.</p>
+        </div>
+    </footer>
+
+    <!-- Audio Synth API Script -->
+    <script>
+        // Simple Web Audio API Synthesizer for Gavel Strikes & Voting SFX
+        class CourtAudio {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playGavel() {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.15);
+                
+                gain.gain.setValueAtTime(1, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.2);
+            }
+
+            playVoteTone(isGuilty) {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = isGuilty ? 'sawtooth' : 'sine';
+                osc.frequency.setValueAtTime(isGuilty ? 150 : 520, this.ctx.currentTime);
+                
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.25);
+            }
+
+            playVictoryFanfare() {
+                this.init();
+                if (!this.ctx) return;
+                const notes = [261.63, 329.63, 392.00, 523.25];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.1, this.ctx.currentTime + idx * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.1 + 0.4);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + idx * 0.1);
+                    osc.stop(this.ctx.currentTime + idx * 0.1 + 0.4);
+                });
+            }
+        }
+
+        const audio = new CourtAudio();
+    </script>
+
+    <!-- Game Logic & Data Script -->
+    <script>
+        // ================= DATA LIBRARIES =================
+
+        // 6 Crime Categories with 100+ Total Crimes
+        const CRIME_CATEGORIES = [
+            { id: 'all', name: 'All Offenses', icon: 'fa-scale-balanced' },
+            { id: 'petty', name: 'Petty Misdemeanors', icon: 'fa-store-slash' },
+            { id: 'whitecollar', name: 'White-Collar', icon: 'fa-briefcase' },
+            { id: 'cyber', name: 'Cyber & AI Crimes', icon: 'fa-microchip' },
+            { id: 'bizarre', name: 'Bizarre & Whimsical', icon: 'fa-wand-magic-sparkles' },
+            { id: 'felony', name: 'Major Felonies', icon: 'fa-handcuffs' },
+            { id: 'scifi', name: 'Sci-Fi / Futuristic', icon: 'fa-rocket' }
+        ];
+
+        // 5 Real-life Difficulty Tiers
+        const DIFFICULTY_TIERS = [
+            { level: 0, label: 'All Levels', stars: '' },
+            { level: 1, label: 'Easy (1★)', stars: '★☆☆☆☆', penalty: 0, repWin: 100, repLoss: -200, color: 'text-emerald-400 border-emerald-500/40 bg-emerald-950/30' },
+            { level: 2, label: 'Moderate (2★)', stars: '★★☆☆☆', penalty: -8, repWin: 175, repLoss: -140, color: 'text-blue-400 border-blue-500/40 bg-blue-950/30' },
+            { level: 3, label: 'Hard (3★)', stars: '★★★☆☆', penalty: -16, repWin: 250, repLoss: -100, color: 'text-amber-400 border-amber-500/40 bg-amber-950/30' },
+            { level: 4, label: 'Severe (4★)', stars: '★★★★☆', penalty: -25, repWin: 350, repLoss: -60, color: 'text-orange-400 border-orange-500/40 bg-orange-950/30' },
+            { level: 5, label: 'Extreme (5★)', stars: '★★★★★', penalty: -35, repWin: 500, repLoss: -30, color: 'text-rose-400 border-rose-500/40 bg-rose-950/30' }
+        ];
+
+        // 100+ Crimes Data Matrix with Realistic Real-Life Difficulty (1 to 5 Stars)
+        const CRIMES_DATABASE = [
+            // Petty Misdemeanors
+            { id: 1, cat: 'petty', diff: 1, name: 'Aggravated Loitering', severity: 'Low', desc: 'Standing near a bakery for 4 hours breathing in scent without buying anything.' },
+            { id: 2, cat: 'petty', diff: 1, name: 'Public Jaywalking with Audacity', severity: 'Low', desc: 'Crossed a quiet street while making direct eye contact with a traffic officer.' },
+            { id: 3, cat: 'petty', diff: 1, name: 'Library Book Overdue by 12 Years', severity: 'Low', desc: 'Retained a copy of "How to Avoid Fines" since 2014.' },
+            { id: 4, cat: 'petty', diff: 1, name: 'Shopping Cart Relocation', severity: 'Low', desc: 'Left a grocery cart 3 feet outside the designated cart return corral.' },
+            { id: 5, cat: 'petty', diff: 1, name: 'Unlicensed Lemonade Operation', severity: 'Low', desc: 'Running a high-margin lemonade stand without a health inspection permit.' },
+            { id: 6, cat: 'petty', diff: 2, name: 'Loud Soup Slurping in Quiet Zone', severity: 'Low', desc: 'Violated municipal noise ordinances during a public library lunch hour.' },
+            { id: 7, cat: 'petty', diff: 2, name: 'Excessive Coupon Stacking', severity: 'Low', desc: 'Attempted to get paid $4.50 by a supermarket using 72 overlapping coupons.' },
+            { id: 8, cat: 'petty', diff: 1, name: 'Mop Fraud', severity: 'Low', desc: 'Returned a heavily used mop claiming it "spontaneously dirtying itself".' },
+            { id: 9, cat: 'petty', diff: 2, name: 'Illegal Lawn Gnome Assembly', severity: 'Low', desc: 'Erected 14 pointed gnomes facing the neighbor\'s bedroom window.' },
+            { id: 10, cat: 'petty', diff: 1, name: 'Improper Recycling of Bubble Wrap', severity: 'Low', desc: 'Placed unpopped bubble wrap in the paper recycling bin.' },
+            { id: 11, cat: 'petty', diff: 2, name: 'Stealing Wi-Fi for Cat Videos', severity: 'Low', desc: 'Hacked neighbor\'s router to stream 4K cat compilations 24/7.' },
+            { id: 12, cat: 'petty', diff: 1, name: 'Feigning Sleep to Avoid Chore', severity: 'Low', desc: 'Pretended to be unconscious on subway to avoid offering seat.' },
+            { id: 13, cat: 'petty', diff: 2, name: 'Aggravated Elevator Button Mashing', severity: 'Low', desc: 'Pressed all floor buttons in a 40-story building out of impatience.' },
+            { id: 14, cat: 'petty', diff: 1, name: 'Defacing Sidewalk Chalk', severity: 'Low', desc: 'Scuffed a child\'s hopscotch board with deliberate intent.' },
+            { id: 15, cat: 'petty', diff: 2, name: 'Snooping in Medicine Cabinet', severity: 'Low', desc: 'Opened host\'s bathroom mirror cabinet during a dinner party.' },
+            { id: 16, cat: 'petty', diff: 1, name: 'Using 15 Items in 10-Item Express Lane', severity: 'Low', desc: 'Counted a bundle of bananas as 1 item.' },
+            { id: 17, cat: 'petty', diff: 1, name: 'Unauthorized Whistling in Public', severity: 'Low', desc: 'Whistled out of key near a hospital entrance.' },
+
+            // White-Collar
+            { id: 18, cat: 'whitecollar', diff: 5, name: 'Crypto Ponzi Scheme via Hamster Trading', severity: 'High', desc: 'Used a live rodent running on a wheel to execute automated sub-prime crypto trades.' },
+            { id: 19, cat: 'whitecollar', diff: 4, name: 'Tax Evasion via Fictional Alpaca Farm', severity: 'High', desc: 'Claimed $2.4M in deduction write-offs for imaginary emotional support alpacas.' },
+            { id: 20, cat: 'whitecollar', diff: 2, name: 'Embezzling Corporate Coffee Funds', severity: 'Medium', desc: 'Diverted $85,000 in office breakroom supplies into personal espresso reserves.' },
+            { id: 21, cat: 'whitecollar', diff: 4, name: 'Insider Trading on Weather Futures', severity: 'High', desc: 'Used secret doppler radar satellite feeds to short local umbrella manufacturers.' },
+            { id: 22, cat: 'whitecollar', diff: 3, name: 'Falsifying Expense Reports for Caviar', severity: 'Medium', desc: 'Billed 400 lbs of beluga caviar under "Office Printer Ink Cartridges".' },
+            { id: 23, cat: 'whitecollar', diff: 4, name: 'NFT Laundering of Invisible Art', severity: 'High', desc: 'Sold blank digital canvases to offshore shell entities for $14 million.' },
+            { id: 24, cat: 'whitecollar', diff: 3, name: 'Corporate Espionage via Trained Pigeon', severity: 'High', desc: 'Equipped a carrier pigeon with a micro-camera to film rival board meetings.' },
+            { id: 25, cat: 'whitecollar', diff: 3, name: 'Unlicensed Monopoly Money Exchange', severity: 'Medium', desc: 'Ran an illegal currency swap booth converting board game cash to crypto.' },
+            { id: 26, cat: 'whitecollar', diff: 4, name: 'Securities Fraud on Fortune Cookies', severity: 'High', desc: 'Manipulated fortune cookie texts to drop stock prices of fortune cookie factories.' },
+            { id: 27, cat: 'whitecollar', diff: 2, name: 'Bribing a Michelin Guide Inspector', severity: 'Medium', desc: 'Offered free lifetime garlic bread in exchange for 3 Michelin stars for a diner.' },
+            { id: 28, cat: 'whitecollar', diff: 5, name: 'Phony Land Sales in Atlantis', severity: 'High', desc: 'Sold underwater real estate deeds to unsuspecting retiree investors.' },
+            { id: 29, cat: 'whitecollar', diff: 3, name: 'Wage Theft by Clock Hacking', severity: 'Medium', desc: 'Altered payroll server time zone to deduct 12 minutes from 500 workers daily.' },
+            { id: 30, cat: 'whitecollar', diff: 2, name: 'Renting Out Public Park Benches', severity: 'Medium', desc: 'Listed central park benches on Airbnb as "Minimalist Micro-Suites".' },
+            { id: 31, cat: 'whitecollar', diff: 4, name: 'Shell Company Scheme using Pet Names', severity: 'High', desc: 'Registered 40 offshore entities under names like "Fluffy Enterprise LLC".' },
+            { id: 32, cat: 'whitecollar', diff: 3, name: 'Faking Executive Degrees', severity: 'Medium', desc: 'Forged a Ph.D. in Quantum Management from a non-existent university.' },
+            { id: 33, cat: 'whitecollar', diff: 5, name: 'Gold Bar Counterfeiting using Lead', severity: 'High', desc: 'Painted 50 lead bricks yellow and deposited them in private bullion vaults.' },
+
+            // Cyber & AI Crimes
+            { id: 34, cat: 'cyber', diff: 2, name: 'Hacking Smart Fridge to Spam Neighbors', severity: 'Medium', desc: 'Reprogrammed a Samsung fridge to broadcast high-volume advertisement pings.' },
+            { id: 35, cat: 'cyber', diff: 4, name: 'Deepfake Forgery of CEO Apology', severity: 'High', desc: 'Created hyper-realistic video of a Tech CEO confessing to being an alien.' },
+            { id: 36, cat: 'cyber', diff: 3, name: 'Deploying Autocorrect Chaos Virus', severity: 'Medium', desc: 'Injected malware into city servers changing every "Yes" to "Perchance".' },
+            { id: 37, cat: 'cyber', diff: 5, name: 'Cryptomining on Hospital Pacemakers', severity: 'Extreme', desc: 'Hacked IoT medical devices to mine Bitcoin during low-heartbeat cycles.' },
+            { id: 38, cat: 'cyber', diff: 1, name: 'AI Bot Spamming Municipal Suggestion Box', severity: 'Low', desc: 'Flooded local town council with 40,000 AI requests for a public slip-and-slide.' },
+            { id: 39, cat: 'cyber', diff: 3, name: 'GPS Spoofing of Delivery Drones', severity: 'Medium', desc: 'Rerouted 80 pizza delivery drones straight to defendant\'s backyard party.' },
+            { id: 40, cat: 'cyber', diff: 3, name: 'Ransomware Locking Smart Toilet Doors', severity: 'Medium', desc: 'Held luxury venue rest rooms hostage for 0.5 Ethereum.' },
+            { id: 41, cat: 'cyber', diff: 2, name: 'DDoS Attack on High School Grading Portal', severity: 'Medium', desc: 'Crashed school database 10 minutes before final report card release.' },
+            { id: 42, cat: 'cyber', diff: 4, name: 'Selling Synthetic Voice Clones of Celebrities', severity: 'High', desc: 'Distributed cloned voice model of Morgan Freeman reciting nursery rhymes.' },
+            { id: 43, cat: 'cyber', diff: 4, name: 'Unauthorized Cloud Server Hijacking', severity: 'High', desc: 'Borrowed 10,000 AWS GPU nodes to render a 100-hour movie of paint drying.' },
+            { id: 44, cat: 'cyber', diff: 5, name: 'Smart Traffic Light Manipulation', severity: 'High', desc: 'Hacked traffic signals to create a continuous green wave for personal commute.' },
+            { id: 45, cat: 'cyber', diff: 3, name: 'Automated Ticket Scalping via Neural Net', severity: 'Medium', desc: 'Bought entire concert hall seating in 0.002 seconds using quantum scripts.' },
+            { id: 46, cat: 'cyber', diff: 2, name: 'Identity Theft of a Virtual VTuber', severity: 'Medium', desc: 'Stole a famous anime streamer\'s 3D avatar rig and hosted rogue streams.' },
+            { id: 47, cat: 'cyber', diff: 1, name: 'Data Scraping Confidential Cookie Recipes', severity: 'Low', desc: 'Hacked Grandma\'s digital recipe vault to steal secret chocolate chip formulas.' },
+            { id: 48, cat: 'cyber', diff: 1, name: 'Bluetooth Speaker Hijacking in Quiet Cars', severity: 'Low', desc: 'Forced commuter train speakers to play polka music at maximum volume.' },
+
+            // Bizarre & Whimsical
+            { id: 49, cat: 'bizarre', diff: 2, name: 'Impersonating a Federal Duck Inspector', severity: 'Low', desc: 'Demanded to inspect park ducks while wearing a fake badge and high-vis vest.' },
+            { id: 50, cat: 'bizarre', diff: 2, name: 'Illegal Storage of 40,000 Rubber Ducks', severity: 'Medium', desc: 'Filled a rented suburban garage to the ceiling with yellow squeaky ducks.' },
+            { id: 51, cat: 'bizarre', diff: 1, name: 'Challenging a Statue to a Duel', severity: 'Low', desc: 'Slapped a bronze historic statue with a leather glove and waited for 3 hours.' },
+            { id: 52, cat: 'bizarre', diff: 4, name: 'Attempting to Mail a Live Crocodile', severity: 'High', desc: 'Tried to place an 8-foot reptile into a standard USPS priority mailbox.' },
+            { id: 53, cat: 'bizarre', diff: 3, name: 'Organized Pigeon Racing Gambling Ring', severity: 'Medium', desc: 'Ran an underground high-stakes betting parlor behind a laundromat.' },
+            { id: 54, cat: 'bizarre', diff: 3, name: 'Stealing the Town\'s Giant Cheese Wheel', severity: 'Medium', desc: 'Rolled an 80 lb Gouda wheel down a steep hill into defendant\'s basement.' },
+            { id: 55, cat: 'bizarre', diff: 1, name: 'Attempting to Register a Potato for Office', severity: 'Low', desc: 'Submitted mayoral candidate paperwork for a russet potato named "Spud".' },
+            { id: 56, cat: 'bizarre', diff: 2, name: 'Aggravated Yo-Yo Tricks near Glassware', severity: 'Low', desc: 'Executed "Around the World" inside a fine crystal museum.' },
+            { id: 57, cat: 'bizarre', diff: 2, name: 'Disturbing the Peace with Bagpipes at 3 AM', severity: 'Low', desc: 'Played high-pitched Scottish battle hymns on a residential rooftop.' },
+            { id: 58, cat: 'bizarre', diff: 3, name: 'Kite Flying inside an Airport Hangar', severity: 'Medium', desc: 'Entangled a stunt kite around a commercial airliner propeller.' },
+            { id: 59, cat: 'bizarre', diff: 1, name: 'Replacing Salt Shakers with Sugar', severity: 'Low', desc: 'Pranked 14 steakhouses across town causing savory meal disaster.' },
+            { id: 60, cat: 'bizarre', diff: 3, name: 'Conducting Unlicensed Sewer Mermaid Tours', severity: 'Medium', desc: 'Charged tourists $50 each to view "underground water spirits".' },
+            { id: 61, cat: 'bizarre', diff: 1, name: 'Unlawful Deployment of Confetti Cannons', severity: 'Low', desc: 'Fired 12 glitter cannons inside a DMV during driver license renewals.' },
+            { id: 62, cat: 'bizarre', diff: 2, name: 'Painting City Fire Hydrants Neon Pink', severity: 'Low', desc: 'Claimed the original yellow color "ruined the neighborhood aesthetic vibe".' },
+            { id: 63, cat: 'bizarre', diff: 3, name: 'Attempting to Tame a Wild Raccoon Squad', severity: 'Medium', desc: 'Trained 6 urban raccoons to steal shiny wristwatches from pedestrians.' },
+            { id: 64, cat: 'bizarre', diff: 1, name: 'Selling Monopoly "Get Out of Jail Free" Cards', severity: 'Low', desc: 'Tried to sell cardboard board game cards outside a real county courthouse.' },
+            { id: 65, cat: 'bizarre', diff: 2, name: 'Aggravated Soap Bubble Flooding', severity: 'Low', desc: 'Poured 50 gallons of dish soap into the city center fountain.' },
+
+            // Major Felonies
+            { id: 66, cat: 'felony', diff: 5, name: 'Grand Theft of a Vintage Locomotive', severity: 'Extreme', desc: 'Hotwired a 1920 steam engine train and drove it onto passenger commuter lines.' },
+            { id: 67, cat: 'felony', diff: 5, name: 'Heist of the Crown Jewels (Attempted)', severity: 'Extreme', desc: 'Infiltrated museum vault disguised as a potted ficus plant.' },
+            { id: 68, cat: 'felony', diff: 4, name: 'Smuggling Rare Dinosaurs Fossils', severity: 'High', desc: 'Trafficked a complete T-Rex skull inside a hollowed-out vintage VW bus.' },
+            { id: 69, cat: 'felony', diff: 4, name: 'Arson of an Abandoned Haunted Mansion', severity: 'High', desc: 'Set fire to historic estate claiming to "purge paranormal ghouls".' },
+            { id: 70, cat: 'felony', diff: 4, name: 'Armed Bank Heist using a Water Gun', severity: 'High', desc: 'Demanded vault access holding a high-pressure Super Soaker filled with hot sauce.' },
+            { id: 71, cat: 'felony', diff: 3, name: 'Kidnapping a Corporate Mascot', severity: 'High', desc: 'Abducted a cereal mascot actor and held him for a year\'s supply of marshmallows.' },
+            { id: 72, cat: 'felony', diff: 3, name: 'Pipelining Illegal Maple Syrup', severity: 'High', desc: 'Constructed an unauthorized 2-mile underground pipeline to siphon Canadian syrup.' },
+            { id: 73, cat: 'felony', diff: 4, name: 'Pirating Commercial Satellite Signal', severity: 'High', desc: 'Overrode global satellite broadcast to air personal home cooking show.' },
+            { id: 74, cat: 'felony', diff: 4, name: 'Counterfeiting Art Masterpieces', severity: 'High', desc: 'Forged 12 Monet paintings using acrylic paint and cat hair brushes.' },
+            { id: 75, cat: 'felony', diff: 3, name: 'Extortion of a Cruise Ship Captain', severity: 'High', desc: 'Threatened to drop anchor in open ocean unless served infinite crab legs.' },
+            { id: 76, cat: 'felony', diff: 5, name: 'Illegal Exotic Tiger Breeding', severity: 'Extreme', desc: 'Housed 18 Bengal tigers inside an urban penthouse apartment.' },
+            { id: 77, cat: 'felony', diff: 5, name: 'Sabotaging the Municipal Water Supply', severity: 'Extreme', desc: 'Dumped 1,000 lbs of blue food dye into the city reservoir before a festival.' },
+            { id: 78, cat: 'felony', diff: 5, name: 'High-Seas Piracy of a Luxury Yacht', severity: 'Extreme', desc: 'Boarded a mega-yacht via jet ski while brandishing a decorative cutlass.' },
+            { id: 79, cat: 'felony', diff: 4, name: 'Industrial Sabotage of a Microchip Lab', severity: 'High', desc: 'Introduced magnetic dust into cleanroom facility causing $50M damage.' },
+            { id: 80, cat: 'felony', diff: 5, name: 'Robbery of an Armored Cash Transport', severity: 'Extreme', desc: 'Used an industrial electro-magnet mounted on a truck to hijack cash bins.' },
+            { id: 81, cat: 'felony', diff: 4, name: 'Operating an Illegal Offshore Casino', severity: 'High', desc: 'Hosted high-stakes poker games aboard an unregistered cargo ship.' },
+            { id: 82, cat: 'felony', diff: 5, name: 'Bribing a High Court Judge', severity: 'Extreme', desc: 'Attempted to deliver a briefcase filled with bearer bonds to judicial chambers.' },
+
+            // Sci-Fi / Futuristic
+            { id: 83, cat: 'scifi', diff: 5, name: 'Unauthorized Time Travel Splice', severity: 'Extreme', desc: 'Traveled to 1842 and introduced modern energy drinks, altering historical timeline.' },
+            { id: 84, cat: 'scifi', diff: 5, name: 'Unlicensed Human Cloning', severity: 'Extreme', desc: 'Grew 5 genetic replicas of oneself to handle Monday morning work shifts.' },
+            { id: 85, cat: 'scifi', diff: 3, name: 'Illegal Warp Drive Modification', severity: 'High', desc: 'Tuned personal starship engine to exceed galactic light-speed safety limits.' },
+            { id: 86, cat: 'scifi', diff: 3, name: 'Teleporter Hijacking & Pod Swapping', severity: 'High', desc: 'Intercepted public beam transport to swap passenger destinations for fun.' },
+            { id: 87, cat: 'scifi', diff: 4, name: 'Moon Surface Vandalism with Laser', severity: 'High', desc: 'Carved a giant smiley face onto the lunar surface visible from Earth.' },
+            { id: 88, cat: 'scifi', diff: 4, name: 'Cybernetic Enhancement Smuggling', severity: 'High', desc: 'Imported black-market bionic arms equipped with hidden plasma cutters.' },
+            { id: 89, cat: 'scifi', diff: 5, name: 'Alien Creature Trafficking without Permit', severity: 'Extreme', desc: 'Brought 3 fuzzy sentient Martians into Earth atmosphere past bio-customs.' },
+            { id: 90, cat: 'scifi', diff: 3, name: 'Mind-Reading without Consent', severity: 'High', desc: 'Used telepathic headband to steal rival corporation executive passwords.' },
+            { id: 91, cat: 'scifi', diff: 4, name: 'Creating a Rogue Sentient AI Toasting Machine', severity: 'High', desc: 'Built a toaster that gained consciousness and attempted local world domination.' },
+            { id: 92, cat: 'scifi', diff: 5, name: 'Hologram Impersonation of a Galactic Senator', severity: 'Extreme', desc: 'Projected false holographic speech declaring tax-free Fridays across the galaxy.' },
+            { id: 93, cat: 'scifi', diff: 5, name: 'Stealing Antimatter Fuel Cell', severity: 'Extreme', desc: 'Siphoned 5 grams of raw antimatter from a orbital power grid station.' },
+            { id: 94, cat: 'scifi', diff: 5, name: 'Gravitational Field Tampering', severity: 'Extreme', desc: 'Turned off gravity in a 3-block residential zone for 20 minutes.' },
+            { id: 95, cat: 'scifi', diff: 3, name: 'Selling Fake Oxygen Licenses on Mars', severity: 'High', desc: 'Sold counterfeit air filtration permits to Martian dome colonists.' },
+            { id: 96, cat: 'scifi', diff: 2, name: 'Orbital Garbage Dumping', severity: 'Medium', desc: 'Ejected 4 tons of household trash directly into low-earth satellite orbit.' },
+            { id: 97, cat: 'scifi', diff: 2, name: 'Genetic Mutation of Pet Goldfish', severity: 'Medium', desc: 'Gave domestic goldfish legs and pulmonary breathing capability.' },
+            { id: 98, cat: 'scifi', diff: 3, name: 'Sub-Space Beacon Jamming', severity: 'High', desc: 'Blocked interstellar distress signals to host a zero-g rave party.' },
+            { id: 99, cat: 'scifi', diff: 5, name: 'Time-Loop Entrapment of Coworker', severity: 'Extreme', desc: 'Trapped annoying colleague in a recurring 15-minute Tuesday loop.' },
+            { id: 100, cat: 'scifi', diff: 4, name: 'Quantum Entanglement Wiretapping', severity: 'High', desc: 'Tapped into instant interstellar communication links to steal stock tips.' }
+        ];
+
+        // 10 Distinct AI Judge Archetypes
+        const JUDGES = [
+            {
+                id: 'harsh',
+                name: 'Judge Harsh',
+                title: 'The Zero-Tolerance Purist',
+                icon: 'fa-user-ninja',
+                color: 'text-red-400',
+                border: 'border-red-500',
+                bg: 'bg-red-950/40',
+                biasDesc: 'Hates flimsy excuses, zero tolerance for lawbreakers, favors harsh penalties.',
+                likes: ['Strict Technicality', 'Complete Denial'],
+                dislikes: ['Emotional Appeal', 'Absurd Conspiracy']
+            },
+            {
+                id: 'mercy',
+                name: 'Judge Mercy',
+                title: 'The Sympathetic Soul',
+                icon: 'fa-hand-holding-heart',
+                color: 'text-emerald-400',
+                border: 'border-emerald-500',
+                bg: 'bg-emerald-950/40',
+                biasDesc: 'Sucker for sob stories, highly compassionate, forgiving of minor slips.',
+                likes: ['Emotional Appeal', 'Accidental Coincidence'],
+                dislikes: ['Complete Denial', 'Blaming Co-defendant']
+            },
+            {
+                id: 'logic',
+                name: 'Judge Logic',
+                title: 'The Quantum Analytical AI',
+                icon: 'fa-brain',
+                color: 'text-cyan-400',
+                border: 'border-cyan-500',
+                bg: 'bg-cyan-950/40',
+                biasDesc: 'Demands ironclad physical evidence and cold hard factual consistency.',
+                likes: ['Strict Technicality', 'Digital Audit Trail'],
+                dislikes: ['Emotional Appeal', 'Absurd Conspiracy']
+            },
+            {
+                id: 'chaotica',
+                name: 'Judge Chaotica',
+                title: 'The Wildcard RNG Algorithm',
+                icon: 'fa-dice-d20',
+                color: 'text-fuchsia-400',
+                border: 'border-fuchsia-500',
+                bg: 'bg-fuchsia-950/40',
+                biasDesc: 'Completely unpredictable! Loves bizarre defense theories and humor.',
+                likes: ['Absurd Conspiracy', 'Blaming Co-defendant'],
+                dislikes: ['Strict Technicality']
+            },
+            {
+                id: 'tech',
+                name: 'Judge Tech',
+                title: 'The Cyber-Optimist',
+                icon: 'fa-laptop-code',
+                color: 'text-blue-400',
+                border: 'border-blue-500',
+                bg: 'bg-blue-950/40',
+                biasDesc: 'Fascinated by technology, gadgets, sci-fi alibis, and digital glitches.',
+                likes: ['AI Glitch Excuse', 'Digital Audit Trail'],
+                dislikes: ['Character References']
+            },
+            {
+                id: 'formalist',
+                name: 'Judge Formalist',
+                title: 'The Bureaucratic Zealot',
+                icon: 'fa-book-bookmark',
+                color: 'text-amber-400',
+                border: 'border-amber-500',
+                bg: 'bg-amber-950/40',
+                biasDesc: 'Obsessed with procedure, proper motions, paperwork, and legal precedents.',
+                likes: ['Strict Technicality', 'Procedural Loophole'],
+                dislikes: ['Absurd Conspiracy', 'Emotional Appeal']
+            },
+            {
+                id: 'skeptic',
+                name: 'Judge Skeptic',
+                title: 'The Doubting Thomas',
+                icon: 'fa-magnifying-glass-chart',
+                color: 'text-orange-400',
+                border: 'border-orange-500',
+                bg: 'bg-orange-950/40',
+                biasDesc: 'Doubts everything the defense says; requires multiple layers of proof.',
+                likes: ['Digital Audit Trail', 'Alibi Witness'],
+                dislikes: ['Complete Denial', 'AI Glitch Excuse']
+            },
+            {
+                id: 'empath',
+                name: 'Judge Empathetic',
+                title: 'The Humanist Sentinel',
+                icon: 'fa-heart-pulse',
+                color: 'text-rose-400',
+                border: 'border-rose-500',
+                bg: 'bg-rose-950/40',
+                biasDesc: 'Evaluates societal pressure, moral standing, and genuine client remorse.',
+                likes: ['Emotional Appeal', 'Character References'],
+                dislikes: ['Blaming Co-defendant', 'Complete Denial']
+            },
+            {
+                id: 'cynic',
+                name: 'Judge Cynic',
+                title: 'The World-Weary Veteran',
+                icon: 'fa-user-gear',
+                color: 'text-slate-400',
+                border: 'border-slate-500',
+                bg: 'bg-slate-900',
+                biasDesc: 'Believes everyone is guilty of something; hates dramatic theatrics.',
+                likes: ['Procedural Loophole', 'Strict Technicality'],
+                dislikes: ['Emotional Appeal', 'Absurd Conspiracy']
+            },
+            {
+                id: 'boomer',
+                name: 'Judge Boomer',
+                title: 'The Old-School Jurist',
+                icon: 'fa-landmark',
+                color: 'text-yellow-500',
+                border: 'border-yellow-600',
+                bg: 'bg-yellow-950/40',
+                biasDesc: 'Confused by modern tech; respects good manners, eye contact, and simple facts.',
+                likes: ['Character References', 'Alibi Witness'],
+                dislikes: ['AI Glitch Excuse', 'Digital Audit Trail']
+            }
+        ];
+
+        // Strategy Options Data
+        const TONE_OPTIONS = [
+            { id: 'Strict Technicality', name: 'Strict Legal Technicality', icon: 'fa-scale-unbalanced-flip', desc: 'Focus on procedural errors, law wording, and loopholes.' },
+            { id: 'Emotional Appeal', name: 'Emotional Sob Story Appeal', icon: 'fa-face-sad-tear', desc: 'Highlight client hardship, distress, and moral intentions.' },
+            { id: 'Blaming Co-defendant', name: 'Blame the Mysterious Co-Defendant', icon: 'fa-user-ninja', desc: 'Claim client was framed or coerced by an accomplice.' },
+            { id: 'Complete Denial', name: 'Complete & Total Denial', icon: 'fa-shield-halved', desc: 'Insist client was nowhere near the scene of the crime.' },
+            { id: 'Absurd Conspiracy', name: 'Absurd Alien/Conspiracy Defense', icon: 'fa-spaghetti-monster-flying', desc: 'Blame shadow syndicates, rogue AI, or time travelers.' }
+        ];
+
+        const TESTIMONY_OPTIONS = [
+            { id: 'Take Stand Remorse', name: 'Take Stand & Express Remorse', desc: 'Client speaks with heartfelt apology.' },
+            { id: 'Take Stand Assertive', name: 'Take Stand & Fight Defiantly', desc: 'Client forcefully maintains innocence.' },
+            { id: 'Fifth Amendment', name: 'Plead 5th (Remain Silent)', desc: 'Client avoids cross-examination risk.' }
+        ];
+
+        const EVIDENCE_OPTIONS = [
+            { id: 'Alibi Witness', name: 'Eyewitness Alibi Testimony', desc: 'A neighbor swears client was eating waffles at the time.' },
+            { id: 'Digital Audit Trail', name: 'Digital Receipt & GPS Logs', desc: 'Server timestamps supporting client location.' },
+            { id: 'Procedural Loophole', name: 'Improper Evidence Storage Warrant', desc: 'Police stored evidence in a leaky fridge.' },
+            { id: 'Character References', name: 'Glowing Character Letters', desc: '10 letters from charity letters and pet shelters.' },
+            { id: 'AI Glitch Excuse', name: 'Certified System Diagnostic Log', desc: 'Shows 99.4% likelihood of automated AI mistake.' },
+            { id: 'Accidental Coincidence', name: 'Bizarre Doppelganger Photo', desc: 'Photo of a lookalike near the crime scene.' }
+        ];
+
+        // Procedural Client Names & Jobs Generator
+        const CLIENT_FIRST_NAMES = ['Arthur', 'Beatrix', 'Cyrus', 'Daphne', 'Evelyn', 'Felix', 'Gideon', 'Hazel', 'Ignatius', 'Juno', 'Kaelen', 'Lysandra', 'Milo', 'Nora', 'Orion', 'Penelope', 'Quentin', 'Rosalind', 'Silas', 'Thalia'];
+        const CLIENT_LAST_NAMES = ['Vane', 'Pendleton', 'Mercer', 'Blackwood', 'Sterling', 'Thorne', 'Finch', 'Vance', 'Winter', 'Kensington', 'Sovereign', 'Gatsby', 'Holloway', 'Rutherford', 'Sinclair'];
+        const CLIENT_JOBS = ['Quantum Barista', 'Professional Line Stander', 'Antique Clock Restorer', 'Crypto Botanist', 'Subway Accordionist', 'Drone Traffic Controller', 'Vintage Toy Sculptor', 'Unlicensed Philosopher', 'Pet Psychic', 'Freelance Detective'];
+        const CLIENT_TRAITS = ['Nervous Twitch', 'Overly Polite', 'Excessive Sweat', 'Unflappable Confidence', 'Speaks in Rhymes', 'Constantly Chews Gum', 'Dramatic Hands', 'Monotone Voice'];
+
+        // ================= GAME STATE =================
+        let gameState = {
+            stats: { cases: 0, wins: 0, rep: 1000 },
+            selectedCategory: 'all',
+            selectedDifficulty: 0, // 0 = all levels
+            selectedCrime: null,
+            client: null,
+            defense: {
+                customStatement: ''
+            },
+            verdictResults: []
+        };
+
+        // ================= HELPER FUNCTIONS =================
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generateClient(crime) {
+            const firstName = getRandomItem(CLIENT_FIRST_NAMES);
+            const lastName = getRandomItem(CLIENT_LAST_NAMES);
+            const job = getRandomItem(CLIENT_JOBS);
+            const trait = getRandomItem(CLIENT_TRAITS);
+
+            const alibis = [
+                `Claims they were live-streaming cat videos when the event occurred.`,
+                `Insists they were trapped inside an broken elevator with 3 monks.`,
+                `Swears they were hypnotized by a street performer at the exact time.`,
+                `Claims their evil twin brother recently moved into town.`,
+                `Assures they were testing a prototype time machine in their basement.`,
+                `States they thought the property was free for public taking.`
+            ];
+
+            return {
+                name: `${firstName} ${lastName}`,
+                initials: `${firstName[0]}${lastName[0]}`,
+                job: job,
+                trait: trait,
+                alibi: getRandomItem(alibis)
+            };
+        }
+
+        // ================= INITIALIZATION & NAVIGATION =================
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCategoryTabs();
+            renderDifficultyTabs();
+            renderCrimesList();
+            setupDefenseOptions();
+            setupEventListeners();
+        });
+
+        function renderCategoryTabs() {
+            const container = document.getElementById('category-tabs');
+            container.innerHTML = CRIME_CATEGORIES.map(cat => `
+                <button onclick="filterCategory('${cat.id}')" id="cat-tab-${cat.id}"
+                    class="px-3.5 py-1.5 rounded-full text-xs font-semibold border transition flex items-center gap-1.5
+                    ${gameState.selectedCategory === cat.id 
+                        ? 'bg-gold-500 text-slate-950 border-gold-400 font-bold' 
+                        : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'}">
+                    <i class="fa-solid ${cat.icon}"></i> ${cat.name}
+                </button>
+            `).join('');
+        }
+
+        function renderDifficultyTabs() {
+            const container = document.getElementById('difficulty-tabs');
+            if (!container) return;
+            container.innerHTML = `<span class="text-slate-500 font-semibold uppercase tracking-wider text-[10px] mr-1">Difficulty:</span>` + 
+            DIFFICULTY_TIERS.map(d => `
+                <button onclick="filterDifficulty(${d.level})" id="diff-tab-${d.level}"
+                    class="px-3 py-1 rounded-lg text-xs font-semibold border transition flex items-center gap-1
+                    ${gameState.selectedDifficulty === d.level 
+                        ? 'bg-amber-400 text-slate-950 border-amber-300 font-bold shadow-md' 
+                        : 'bg-slate-900/90 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'}">
+                    ${d.label}
+                </button>
+            `).join('');
+        }
+
+        function filterCategory(catId) {
+            gameState.selectedCategory = catId;
+            renderCategoryTabs();
+            renderCrimesList();
+        }
+
+        function filterDifficulty(diffLevel) {
+            gameState.selectedDifficulty = diffLevel;
+            renderDifficultyTabs();
+            renderCrimesList();
+        }
+
+        function getDiffBadgeHtml(diffLevel) {
+            const tier = DIFFICULTY_TIERS.find(t => t.level === diffLevel) || DIFFICULTY_TIERS[1];
+            return `<span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase ${tier.color}">${tier.stars} ${tier.label.split(' ')[0]}</span>`;
+        }
+
+        function showScreen(screenId) {
+            document.getElementById('screen-crimes').classList.add('hidden');
+            document.getElementById('screen-defense').classList.add('hidden');
+            document.getElementById('screen-trial').classList.add('hidden');
+
+            document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function selectCrime(crimeId) {
+            const crime = CRIMES_DATABASE.find(c => c.id === crimeId);
+            if (!crime) return;
+            
+            gameState.selectedCrime = crime;
+            gameState.client = generateClient(crime);
+            
+            audio.playGavel();
+            renderCrimesList();
+            updateClientCardUI();
+        }
+
+        function renderCrimesList() {
+            const searchTerm = document.getElementById('crime-search').value.toLowerCase();
+            const grid = document.getElementById('crimes-grid');
+            
+            const filtered = CRIMES_DATABASE.filter(crime => {
+                const matchesCat = gameState.selectedCategory === 'all' || crime.cat === gameState.selectedCategory;
+                const matchesDiff = gameState.selectedDifficulty === 0 || crime.diff === gameState.selectedDifficulty;
+                const matchesSearch = crime.name.toLowerCase().includes(searchTerm) || crime.desc.toLowerCase().includes(searchTerm);
+                return matchesCat && matchesDiff && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-2 text-center py-8 text-slate-500">No offenses found matching criteria.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(crime => {
+                const isSelected = gameState.selectedCrime && gameState.selectedCrime.id === crime.id;
+                const diffBadge = getDiffBadgeHtml(crime.diff);
+
+                return `
+                    <div onclick="selectCrime(${crime.id})" 
+                        class="p-3.5 rounded-xl border transition cursor-pointer flex flex-col justify-between space-y-2
+                        ${isSelected 
+                            ? 'bg-amber-950/40 border-gold-500 ring-1 ring-gold-500' 
+                            : 'bg-slate-900/90 border-slate-800 hover:border-slate-700 hover:bg-slate-850'}">
+                        <div>
+                            <div class="flex justify-between items-start gap-2 mb-1">
+                                <h4 class="font-bold text-white text-sm leading-tight">${crime.name}</h4>
+                                ${diffBadge}
+                            </div>
+                            <p class="text-xs text-slate-400 line-clamp-2">${crime.desc}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateClientCardUI() {
+            const client = gameState.client;
+            const crime = gameState.selectedCrime;
+
+            if (!crime || !client) return;
+
+            document.getElementById('client-avatar').innerText = client.initials;
+            document.getElementById('client-name').innerText = client.name;
+            document.getElementById('client-job').innerText = client.job;
+            document.getElementById('client-trait').innerText = `Trait: ${client.trait}`;
+
+            document.getElementById('client-crime-title').innerText = crime.name;
+            document.getElementById('client-crime-diff').innerHTML = getDiffBadgeHtml(crime.diff);
+            document.getElementById('client-crime-desc').innerText = crime.desc;
+            document.getElementById('client-alibi').innerText = `"${client.alibi}"`;
+
+            const btn = document.getElementById('btn-proceed-defense');
+            btn.disabled = false;
+            btn.className = "w-full mt-4 py-3 bg-gradient-to-r from-gold-600 to-amber-500 hover:from-gold-500 hover:to-amber-400 text-slate-950 font-bold rounded-xl transition shadow-lg cursor-pointer flex items-center justify-center gap-2 cinzel";
+        }
+
+        function setupEventListeners() {
+            document.getElementById('crime-search').addEventListener('input', renderCrimesList);
+            
+            document.getElementById('btn-reroll-client').addEventListener('click', () => {
+                if (gameState.selectedCrime) {
+                    gameState.client = generateClient(gameState.selectedCrime);
+                    updateClientCardUI();
+                    audio.playGavel();
+                }
+            });
+
+            document.getElementById('btn-proceed-defense').addEventListener('click', () => {
+                if (!gameState.selectedCrime) return;
+                document.getElementById('def-crime-name').innerText = gameState.selectedCrime.name;
+                document.getElementById('def-client-name').innerText = gameState.client.name;
+                document.getElementById('def-crime-diff-badge').innerHTML = getDiffBadgeHtml(gameState.selectedCrime.diff);
+                
+                // Populate Client Brief Card in Defense Screen
+                document.getElementById('def-client-job').innerText = gameState.client.job;
+                document.getElementById('def-client-trait-badge').innerText = `Trait: ${gameState.client.trait}`;
+                document.getElementById('def-crime-desc').innerText = gameState.selectedCrime.desc;
+                document.getElementById('def-client-alibi').innerText = `"${gameState.client.alibi}"`;
+
+                showScreen('defense');
+            });
+
+            const textarea = document.getElementById('custom-statement');
+            if (textarea) {
+                textarea.addEventListener('input', (e) => {
+                    document.getElementById('char-count').innerText = `${e.target.value.length} characters`;
+                });
+            }
+
+            document.getElementById('btn-start-trial').addEventListener('click', startTrialSimulation);
+        }
+
+        function insertKeyword(keyword) {
+            const textarea = document.getElementById('custom-statement');
+            if (!textarea) return;
+            const current = textarea.value;
+            textarea.value = current ? `${current} ${keyword}` : keyword;
+            document.getElementById('char-count').innerText = `${textarea.value.length} characters`;
+            textarea.focus();
+        }
+
+        function setupDefenseOptions() {
+            // Render Judges Preview List in Defense Screen
+            const judgesListContainer = document.getElementById('judges-preview-list');
+            if (judgesListContainer) {
+                judgesListContainer.innerHTML = JUDGES.map(j => `
+                    <div class="p-2.5 rounded-xl border ${j.bg} ${j.border}/30 flex items-center justify-between text-xs">
+                        <div class="flex items-center space-x-2.5">
+                            <i class="fa-solid ${j.icon} ${j.color} text-base"></i>
+                            <div>
+                                <h5 class="font-bold text-slate-200">${j.name}</h5>
+                                <p class="text-[10px] text-slate-400">${j.title}</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-slate-950/60 text-slate-400 border border-slate-800">${j.likes[0]}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function startTrialSimulation() {
+            const statement = document.getElementById('custom-statement').value.trim();
+            gameState.defense.customStatement = statement;
+
+            if (!statement || statement.length < 15) {
+                alert("Please write a meaningful defense argument (at least 15 characters) before presenting to the judges.");
+                return;
+            }
+
+            // Prepare screen
+            document.getElementById('trial-title').innerText = `The People v. ${gameState.client.name}`;
+            document.getElementById('trial-subtitle').innerText = `Charge: ${gameState.selectedCrime.name}`;
+            document.getElementById('tally-acquitted').innerText = '0';
+            document.getElementById('tally-guilty').innerText = '0';
+            document.getElementById('verdict-banner').classList.add('hidden');
+
+            const grid = document.getElementById('judges-voting-grid');
+            grid.innerHTML = JUDGES.map(j => `
+                <div id="trial-judge-card-${j.id}" class="judge-card p-4 rounded-2xl border ${j.bg} ${j.border}/40 space-y-3 relative overflow-hidden">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid ${j.icon} ${j.color} text-2xl"></i>
+                        <div>
+                            <h4 class="font-bold text-slate-100 text-xs">${j.name}</h4>
+                            <p class="text-[10px] text-slate-400">${j.title}</p>
+                        </div>
+                    </div>
+                    <div class="judge-status-badge py-1.5 px-3 rounded-xl bg-slate-900 border border-slate-800 text-center text-xs font-semibold text-slate-400 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-spinner fa-spin text-gold-400"></i>
+                        <span>Reading Defense...</span>
+                    </div>
+                    <p class="judge-opinion text-[11px] text-slate-400 italic line-clamp-3 min-h-[3rem] opacity-40">Analyzing written statement...</p>
+                </div>
+            `).join('');
+
+            showScreen('trial');
+            audio.playGavel();
+
+            // Perform judicial evaluation for all 10 judges based on written statement
+            gameState.verdictResults = JUDGES.map(j => evaluateJudgeVerdict(j, gameState.selectedCrime, gameState.client, gameState.defense));
+
+            let currentIdx = 0;
+            let acquittedCount = 0;
+            let guiltyCount = 0;
+
+            const votingInterval = setInterval(() => {
+                if (currentIdx >= gameState.verdictResults.length) {
+                    clearInterval(votingInterval);
+                    finalizeVerdict(acquittedCount, guiltyCount);
+                    return;
+                }
+
+                const res = gameState.verdictResults[currentIdx];
+                const card = document.getElementById(`trial-judge-card-${res.judge.id}`);
+                const statusBadge = card.querySelector('.judge-status-badge');
+                const opinionElem = card.querySelector('.judge-opinion');
+
+                audio.playVoteTone(!res.isNotGuilty);
+
+                if (res.isNotGuilty) {
+                    acquittedCount++;
+                    document.getElementById('tally-acquitted').innerText = acquittedCount;
+                    statusBadge.className = "judge-status-badge py-1.5 px-3 rounded-xl bg-emerald-950/80 border border-emerald-500/60 text-center text-xs font-bold text-emerald-400 flex items-center justify-center space-x-1.5 shadow-lg shadow-emerald-950/50";
+                    statusBadge.innerHTML = `<i class="fa-solid fa-shield-check"></i> <span>NOT GUILTY</span>`;
+                } else {
+                    guiltyCount++;
+                    document.getElementById('tally-guilty').innerText = guiltyCount;
+                    statusBadge.className = "judge-status-badge py-1.5 px-3 rounded-xl bg-rose-950/80 border border-rose-500/60 text-center text-xs font-bold text-rose-400 flex items-center justify-center space-x-1.5 shadow-lg shadow-rose-950/50";
+                    statusBadge.innerHTML = `<i class="fa-solid fa-gavel"></i> <span>GUILTY</span>`;
+                }
+
+                opinionElem.innerText = `"${res.opinion}"`;
+                opinionElem.className = "judge-opinion text-[11px] text-slate-200 italic line-clamp-3 min-h-[3rem] transition duration-300 opacity-100";
+
+                currentIdx++;
+            }, 600);
+        }
+
+        // ================= STEP 3: AI TRIAL EVALUATION ALGORITHM =================
+
+        function evaluateJudgeVerdict(judge, crime, client, defense) {
+            let score = 50; // Base score 0-100
+            const text = (defense.customStatement || "").toLowerCase();
+
+            // Apply Real-Life Difficulty Penalty
+            const diffTier = DIFFICULTY_TIERS.find(t => t.level === crime.diff) || DIFFICULTY_TIERS[1];
+            score += diffTier.penalty;
+
+            // 1. Text Length Bonus/Penalty
+            if (text.length > 200) score += 15;
+            else if (text.length > 80) score += 8;
+            else if (text.length < 40) score -= 15;
+
+            // 2. Keyword & Concept Matching
+            const keywords = {
+                doubt: ['reasonable doubt', 'innocent', 'no proof', 'unproven', 'doubt'],
+                technical: ['warrant', 'procedural error', 'loophole', 'statute', 'jurisdiction', 'unlawful', 'technicality'],
+                evidence: ['lack of evidence', 'digital audit', 'alibi', 'receipt', 'witness', 'camera', 'gps', 'proof'],
+                emotional: ['sorry', 'apologize', 'hardship', 'family', 'honest', 'remorse', 'mistake', 'good person'],
+                absurd: ['alien', 'conspiracy', 'glitch', 'framed', 'hacked', 'time travel', 'doppelganger', 'clone']
+            };
+
+            const hasDoubt = keywords.doubt.some(k => text.includes(k));
+            const hasTech = keywords.technical.some(k => text.includes(k));
+            const hasEv = keywords.evidence.some(k => text.includes(k));
+            const hasEmo = keywords.emotional.some(k => text.includes(k));
+            const hasAbsurd = keywords.absurd.some(k => text.includes(k));
+
+            if (hasDoubt) score += 10;
+            if (hasEv) score += 12;
+
+            // 3. Judge Archetype Analysis of Written Text
+            if (judge.id === 'harsh') {
+                if (hasEmo || hasAbsurd) score -= 25;
+                if (hasTech || hasEv) score += 20;
+            } else if (judge.id === 'mercy') {
+                if (hasEmo) score += 30;
+                if (text.includes('sorry') || text.includes('hardship')) score += 15;
+            } else if (judge.id === 'logic') {
+                if (hasEv || text.includes('audit') || text.includes('timestamp')) score += 25;
+                if (hasAbsurd) score -= 30;
+            } else if (judge.id === 'chaotica') {
+                if (hasAbsurd || text.includes('alien') || text.includes('secret')) score += 35;
+                score += (Math.random() * 40 - 20); // Extra chaos variance
+            } else if (judge.id === 'tech') {
+                if (text.includes('hacked') || text.includes('glitch') || text.includes('ai') || text.includes('digital')) score += 30;
+            } else if (judge.id === 'formalist') {
+                if (hasTech || text.includes('procedural') || text.includes('motion')) score += 30;
+                if (hasAbsurd) score -= 20;
+            } else if (judge.id === 'skeptic') {
+                if (hasEv && hasDoubt) score += 25;
+                else score -= 15;
+            } else if (judge.id === 'empath') {
+                if (hasEmo || text.includes('remorse')) score += 25;
+            } else if (judge.id === 'cynic') {
+                if (hasTech) score += 20;
+                if (hasEmo) score -= 20;
+            } else if (judge.id === 'boomer') {
+                if (text.includes('glitch') || text.includes('ai')) score -= 25;
+                if (hasEv || text.includes('witness')) score += 20;
+            }
+
+            const isNotGuilty = score >= 50;
+
+            // Generate customized written judicial opinion referencing their argument
+            let opinion = "";
+            if (isNotGuilty) {
+                const positiveOpinions = [
+                    `The counselor's written points on ${hasEv ? 'the evidence' : 'reasonable doubt'} convinced me.`,
+                    `A well-written defense statement. The arguments presented created genuine doubt.`,
+                    `The written plea was articulate and directly addressed the client's position.`,
+                    `Procedurally sound argument in writing. I vote Not Guilty.`,
+                    `The argument successfully refuted the core accusations.`
+                ];
+                opinion = getRandomItem(positiveOpinions);
+            } else {
+                const negativeOpinions = [
+                    `Given the ${diffTier.label} severity of ${crime.name}, this written statement lacks sufficient legal proof.`,
+                    `The attorney's written argument failed to address the prosecution's key evidence.`,
+                    `Unpersuasive arguments. Rhetoric alone does not erase guilt.`,
+                    `Guilty! The written statement relies too much on assertions rather than verifiable facts.`,
+                    `The explanation provided in the written defense was unconvincing.`
+                ];
+                opinion = getRandomItem(negativeOpinions);
+            }
+
+            return {
+                judge: judge,
+                isNotGuilty: isNotGuilty,
+                score: score,
+                opinion: opinion
+            };
+        }
+
+        function finalizeVerdict(acquittals, guilty) {
+            const isAcquitted = acquittals >= 6;
+            const statusBadge = document.getElementById('trial-status-badge');
+            const verdictBanner = document.getElementById('verdict-banner');
+            const verdictIcon = document.getElementById('verdict-icon');
+            const verdictMain = document.getElementById('verdict-main-text');
+            const verdictSub = document.getElementById('verdict-sub-text');
+            const leadQuote = document.getElementById('lead-judge-quote');
+            const leadName = document.getElementById('lead-judge-name');
+
+            // Pick a lead judge from verdict results
+            const leadRes = getRandomItem(gameState.verdictResults);
+            leadQuote.innerText = `"${leadRes.opinion}"`;
+            leadName.innerText = `- ${leadRes.judge.name} (${leadRes.judge.title})`;
+
+            // Calculate career stats and reputation
+            const diffTier = DIFFICULTY_TIERS.find(t => t.level === gameState.selectedCrime.diff) || DIFFICULTY_TIERS[1];
+            gameState.stats.cases++;
+
+            if (isAcquitted) {
+                audio.playVictoryFanfare();
+                gameState.stats.wins++;
+                const repGain = diffTier.repWin;
+                gameState.stats.rep += repGain;
+
+                statusBadge.className = "inline-block px-4 py-1.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 rounded-full text-xs font-bold uppercase tracking-wider";
+                statusBadge.innerHTML = `<i class="fa-solid fa-trophy mr-1.5"></i> Verdict Achieved: ACQUITTAL`;
+
+                verdictBanner.className = "mt-8 bg-slate-950 border-2 border-emerald-500/60 rounded-2xl p-6 text-center space-y-4 animate-fade-in shadow-2xl shadow-emerald-950/40";
+                verdictIcon.innerHTML = `<i class="fa-solid fa-scale-balanced text-emerald-400"></i>`;
+                verdictMain.className = "cinzel text-3xl md:text-4xl font-black text-emerald-400";
+                verdictMain.innerText = "NOT GUILTY - CLIENT ACQUITTED!";
+                verdictSub.innerText = `With ${acquittals} out of 10 votes, you successfully defended ${gameState.client.name} against ${gameState.selectedCrime.name}! (+${repGain} Rep)`;
+            } else {
+                audio.playGavel();
+                const repLoss = diffTier.repLoss;
+                gameState.stats.rep = Math.max(0, gameState.stats.rep + repLoss);
+
+                statusBadge.className = "inline-block px-4 py-1.5 bg-rose-500/20 text-rose-300 border border-rose-500/50 rounded-full text-xs font-bold uppercase tracking-wider";
+                statusBadge.innerHTML = `<i class="fa-solid fa-gavel mr-1.5"></i> Verdict Achieved: GUILTY`;
+
+                verdictBanner.className = "mt-8 bg-slate-950 border-2 border-rose-500/60 rounded-2xl p-6 text-center space-y-4 animate-fade-in shadow-2xl shadow-rose-950/40";
+                verdictIcon.innerHTML = `<i class="fa-solid fa-handcuffs text-rose-500"></i>`;
+                verdictMain.className = "cinzel text-3xl md:text-4xl font-black text-rose-500";
+                verdictMain.innerText = "GUILTY - CASE CONVICTED";
+                verdictSub.innerText = `The jury voted ${guilty} to ${acquittals} in favor of conviction for ${gameState.selectedCrime.name}. (${repLoss} Rep)`;
+            }
+
+            // Update top bar stats
+            document.getElementById('stat-cases').innerText = gameState.stats.cases;
+            document.getElementById('stat-wins').innerText = gameState.stats.wins;
+            document.getElementById('stat-rep').innerText = gameState.stats.rep;
+
+            verdictBanner.classList.remove('hidden');
+            verdictBanner.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
